@@ -73145,14 +73145,32 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "WelcomeView", ()=>WelcomeView);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _welcomeViewCss = require("./welcome-view.css");
-var _reactRouterDom = require("react-router-dom");
 const WelcomeView = ()=>{
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        className: "select-service",
-        children: "Test"
-    }, void 0, false, {
+        class: "form-group",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
+                for: "exampleInputEmail1",
+                children: "Enter New Address"
+            }, void 0, false, {
+                fileName: "client/src/components/welcome-view/welcome-view.jsx",
+                lineNumber: 6,
+                columnNumber: 7
+            }, undefined),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("input", {
+                type: "email",
+                class: "form-control",
+                "aria-describedby": "emailHelp",
+                placeholder: "Ex. 1234 Cherrywood Ln"
+            }, void 0, false, {
+                fileName: "client/src/components/welcome-view/welcome-view.jsx",
+                lineNumber: 7,
+                columnNumber: 7
+            }, undefined)
+        ]
+    }, void 0, true, {
         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-        lineNumber: 6,
+        lineNumber: 5,
         columnNumber: 5
     }, undefined);
 };
@@ -73165,7 +73183,7 @@ $RefreshReg$(_c, "WelcomeView");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","./welcome-view.css":"pJM6g","react-router-dom":"9xmpe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"pJM6g":[function() {},{}],"km3Ru":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","./welcome-view.css":"pJM6g","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"pJM6g":[function() {},{}],"km3Ru":[function(require,module,exports) {
 "use strict";
 var Refresh = require("7422ead32dcc1e6b");
 function debounce(func, delay) {

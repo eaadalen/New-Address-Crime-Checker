@@ -1,8 +1,11 @@
-.sample {
+@import '../../../../node_modules/bootstrap/dist/css/bootstrap.css';
+
+.form-group {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   justify-content: center;
   align-items: center;
   text-align: center;
+  margin: 40%;
   margin-top: 10%;
   font-size: 25px;
 }

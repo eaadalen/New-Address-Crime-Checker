@@ -1,10 +1,10 @@
 import "./welcome-view.css"
-import { Link } from "react-router-dom";
 
 export const WelcomeView = () => {
   return (
-    <div className='select-service'>
-      Test
+    <div class="form-group">
+      <label for="exampleInputEmail1">Enter New Address</label>
+      <input type="email" class="form-control" aria-describedby="emailHelp" placeholder="Ex. 1234 Cherrywood Ln"></input>
     </div>
   )
 }
