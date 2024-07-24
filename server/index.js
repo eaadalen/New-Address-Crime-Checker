@@ -29,7 +29,7 @@ const userExpletives = Models.userExpletives
 const server_url = 'http://localhost:4242'
 const client_url = 'http://localhost:1234'
 
-mongoose.connect('', { useNewUrlParser: true, useUnifiedTopology: true })
+//mongoose.connect('', { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Stripe fulfill order
 const fulfillOrder = () => {

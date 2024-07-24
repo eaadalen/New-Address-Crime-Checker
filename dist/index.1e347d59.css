@@ -1,0 +1,20 @@
+.sample {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10%;
+  font-family: Cambria, Cochin, Georgia, Times, Times New Roman, serif;
+  font-size: 25px;
+}
+
+html {
+  touch-action: manipulation;
+  height: 100%;
+  top: -3px;
+}
+
+body {
+  height: 100%;
+  overflow: auto;
+}
+/*# sourceMappingURL=index.1e347d59.css.map */
