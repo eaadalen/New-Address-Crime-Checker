@@ -1,0 +1,1 @@
+-make responsive design. Have different layout for mobile vs desktop
