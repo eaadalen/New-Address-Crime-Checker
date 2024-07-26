@@ -1,5 +1,3 @@
-@import '../../../../node_modules/bootstrap/dist/css/bootstrap.css';
-
 .form-group {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   justify-content: center;
@@ -8,4 +6,12 @@
   margin: 40%;
   margin-top: 10%;
   font-size: 25px;
+}
+
+#map {
+  height: 400px; /* The height is 400 pixels */
+  width: 400px; /* The width is the width of the web page */
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
