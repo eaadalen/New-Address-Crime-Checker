@@ -1,5 +1,6 @@
 import "./welcome-view.css"
 import { useState, useEffect } from "react";
+import crime_data from '../../../assets/crime_data/sorted_crime_data.json'
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -10,9 +11,41 @@ export const WelcomeView = () => {
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
       key: process.env.GOOGLE_MAPS_API_KEY_GENERATE_MAP,
-      v: "weekly",
+      v: "weekly"
     })
+
+    const targetLatitude = "45.00689";
+    const result = binarySearchByLatitude(crime_data, targetLatitude);
+
+    if (result) {
+      console.log('Item found:', result);
+    } else {
+      console.log('Item not found');
+    }
+
   }, [])
+
+  function binarySearchByLatitude(array, targetLatitude) {
+    let low = 0;
+    let high = array.length - 1;
+  
+    while (low <= high) {
+      const mid = Math.floor((low + high) / 2);
+      const midItem = array[mid];
+  
+      if (midItem.Latitude === targetLatitude) {
+        return midItem; // Found the item
+      }
+  
+      if (midItem.Latitude < targetLatitude) {
+        low = mid + 1; // Search in the right half
+      } else {
+        high = mid - 1; // Search in the left half
+      }
+    }
+  
+    return null; // Item not found
+  }
 
   async function initMap() {
     const position = { lat: latitude, lng: longitude };
