@@ -1,6 +1,5 @@
 import "./welcome-view.css"
 import { useState, useEffect } from "react";
-import sortPackageJson from 'sort-package-json'
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -13,30 +12,6 @@ export const WelcomeView = () => {
       key: process.env.GOOGLE_MAPS_API_KEY_GENERATE_MAP,
       v: "weekly",
     })
-  }, [])
-
-  useEffect(() => {
-    const packageJsonString = `[
-      {"Occurred_Date":"2019/01/01 00:01:58+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.01776","Longitude":"-93.30953"}
-      ,
-      {"Occurred_Date":"2019/01/01 00:02:07+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.00201","Longitude":"-93.31461"}
-      ,
-      {"Occurred_Date":"2019/01/01 00:02:59+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.00689","Longitude":"-93.30062"}
-      ,
-      {"Occurred_Date":"2019/01/01 00:03:44+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.03663","Longitude":"-93.28883"}
-      ,
-      {"Occurred_Date":"2019/01/01 00:04:01+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.02591","Longitude":"-93.31539"}
-      ,
-      {"Occurred_Date":"2019/01/01 00:04:49+00","Offense":"Sound of Shots Fired (P)","Latitude":"45.01855","Longitude":"-93.29496"}
-    ]`
-
-    const packageJsonObject = JSON.parse(packageJsonString)
-
-    const sorted = sortPackageJson(packageJsonObject, {
-      sortOrder: ['Latitude'],
-    })
-
-    console.log(sorted)
   }, [])
 
   async function initMap() {
