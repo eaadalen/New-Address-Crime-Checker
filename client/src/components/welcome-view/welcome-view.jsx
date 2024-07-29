@@ -13,56 +13,120 @@ export const WelcomeView = () => {
       key: process.env.GOOGLE_MAPS_API_KEY_GENERATE_MAP,
       v: "weekly"
     })
-
-    const targetLatitude = "45.00689";
-    const result = binarySearchByLatitude(crime_data, targetLatitude);
-
-    if (result) {
-      console.log('Item found:', result);
-    } else {
-      console.log('Item not found');
-    }
-
   }, [])
 
   function binarySearchByLatitude(array, targetLatitude) {
     let low = 0;
     let high = array.length - 1;
   
-    while (low <= high) {
-      const mid = Math.floor((low + high) / 2);
-      const midItem = array[mid];
-  
-      if (midItem.Latitude === targetLatitude) {
-        return midItem; // Found the item
-      }
+    while (true) {
+      const midIndex = Math.floor((low + high) / 2);
+      const midItem = array[midIndex];
   
       if (midItem.Latitude < targetLatitude) {
-        low = mid + 1; // Search in the right half
+        low = midIndex + 1; // Search in the right half
       } else {
-        high = mid - 1; // Search in the left half
+        high = midIndex - 1; // Search in the left half
+      }
+
+      if (low > high) {
+        return midIndex
       }
     }
-  
-    return null; // Item not found
   }
 
-  async function initMap() {
+  async function initMap(markerArray) {
     const position = { lat: latitude, lng: longitude };
     const { Map } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
     map = new Map(document.getElementById("map"), {
-      zoom: 15,
+      zoom: 16,
       center: position,
       mapId: "crime_map",
     });
 
-    const marker = new AdvancedMarkerElement({
+    const markers = new AdvancedMarkerElement({
       map: map,
-      position: position,
-      title: "Minneapolis",
+      position: position
+    },{
+      map: map,
+      position: { lat: markerArray[0].Latitude, lng: markerArray[0].Longitude }
     });
+
+  }
+
+  const getLatitudeCrimeMarkers = (midIndex) => {
+    let countUp = midIndex
+    let countDown = midIndex
+    let markers = []
+    while (true) {
+      try {
+        if (crime_data[countUp].Latitude - crime_data[midIndex].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
+          markers.push(crime_data[countUp])
+          countUp++
+        }
+        else {
+          break
+        }
+      }
+      catch {
+        // skip to next
+      }
+    }
+    while (true) {
+      try {
+        if (crime_data[midIndex].Latitude - crime_data[countDown].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
+          markers.push(crime_data[countDown])
+          countDown--
+        }
+        else {
+          break
+        }
+      }
+      catch {
+        // skip to next
+      }
+    }
+
+    getLongitudeCrimeMarkers(markers)
+  }
+
+  const getLongitudeCrimeMarkers = (latitudeMarkers) => {
+    let midIndex = Math.round(latitudeMarkers.length / 2)
+    let countUp = midIndex
+    let countDown = midIndex
+    let markers = []
+    while (true) {
+      try {
+        if (latitudeMarkers[countUp].Longitude - latitudeMarkers[midIndex].Longitude < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
+          markers.push(latitudeMarkers[countUp])
+          countUp++
+        }
+        else {
+          break
+        }
+      }
+      catch {
+        // skip to next
+      }
+    }
+    while (true) {
+      try {
+        if (latitudeMarkers[midIndex].Longitude - latitudeMarkers[countDown].Longitude < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
+          markers.push(latitudeMarkers[countDown])
+          countDown--
+        }
+        else {
+          break
+        }
+      }
+      catch {
+        // skip to next
+      }
+    }
+
+    initMap(markers)
   }
 
   const handleInputChange = (event) => {
@@ -90,7 +154,7 @@ export const WelcomeView = () => {
     .then((data) => {
       latitude = data.result.geocode.location.latitude
       longitude = data.result.geocode.location.longitude
-      initMap()
+      getLatitudeCrimeMarkers(binarySearchByLatitude(crime_data, latitude))
     })
   }
 
