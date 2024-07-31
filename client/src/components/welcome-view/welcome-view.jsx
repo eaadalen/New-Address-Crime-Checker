@@ -1,6 +1,8 @@
 import "./welcome-view.css"
 import { useState, useEffect } from "react";
 import crime_data from '../../../assets/crime_data/sorted_crime_data.json'
+import unique_crimes from '../../../assets/crime_data/unique_crimes.json'
+import murder from '../../../assets/crime_icons/murder.png'
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -41,7 +43,7 @@ export const WelcomeView = () => {
     let markers = []
 
     map = new Map(document.getElementById("map"), {
-      zoom: 16,
+      zoom: 15.75,
       center: { lat: latitude, lng: longitude },
       mapId: "crime_map",
     });
@@ -52,6 +54,34 @@ export const WelcomeView = () => {
         position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) }
       }))
     })
+
+    const pin = new PinElement({
+        scale: 1.5,
+        background: "#0000FF",
+        borderColor: "#000000",
+        glyphColor: "#FFFFFF"
+    });
+    const address = new AdvancedMarkerElement({
+      map: map,
+      position: { lat: latitude, lng: longitude },
+      content: pin.element
+    })
+
+    // A marker with a custom SVG glyph.
+    const glyphImg = document.createElement("img");
+
+    glyphImg.src = murder
+    glyphImg.style.height = '30px';
+
+    const glyphSvgPinElement = new PinElement({
+      glyph: glyphImg
+    });
+    const glyphSvgMarkerView = new AdvancedMarkerElement({
+      map,
+      position: { lat: latitude, lng: longitude },
+      content: glyphSvgPinElement.element,
+      title: "A marker using a custom SVG for the glyph.",
+    });
 
   }
 
@@ -88,7 +118,6 @@ export const WelcomeView = () => {
       }
     }
 
-    console.log(markers.length)
     getLongitudeCrimeMarkers(markers)
   }
 
@@ -107,8 +136,6 @@ export const WelcomeView = () => {
         // skip
       }
     }
-
-    console.log(markers.length)
 
     initMap(markers)
   }
