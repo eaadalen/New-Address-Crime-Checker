@@ -36,23 +36,22 @@ export const WelcomeView = () => {
   }
 
   async function initMap(markerArray) {
-    const position = { lat: latitude, lng: longitude };
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    let markers = []
 
     map = new Map(document.getElementById("map"), {
       zoom: 16,
-      center: position,
+      center: { lat: latitude, lng: longitude },
       mapId: "crime_map",
     });
 
-    const markers = new AdvancedMarkerElement({
-      map: map,
-      position: position
-    },{
-      map: map,
-      position: { lat: markerArray[0].Latitude, lng: markerArray[0].Longitude }
-    });
+    markerArray.forEach((element) => {
+      markers.push(new AdvancedMarkerElement({
+        map: map,
+        position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) }
+      }))
+    })
 
   }
 
@@ -89,42 +88,27 @@ export const WelcomeView = () => {
       }
     }
 
+    console.log(markers.length)
     getLongitudeCrimeMarkers(markers)
   }
 
   const getLongitudeCrimeMarkers = (latitudeMarkers) => {
-    let midIndex = Math.round(latitudeMarkers.length / 2)
-    let countUp = midIndex
-    let countDown = midIndex
+    let index = 0
     let markers = []
-    while (true) {
+    while (index < latitudeMarkers.length) {
+      index++
       try {
-        if (latitudeMarkers[countUp].Longitude - latitudeMarkers[midIndex].Longitude < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
-          markers.push(latitudeMarkers[countUp])
-          countUp++
-        }
-        else {
-          break
+        if (Math.abs(latitudeMarkers[index].Longitude - longitude) < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
+          markers.push(latitudeMarkers[index])
+          index++
         }
       }
       catch {
-        // skip to next
+        // skip
       }
     }
-    while (true) {
-      try {
-        if (latitudeMarkers[midIndex].Longitude - latitudeMarkers[countDown].Longitude < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
-          markers.push(latitudeMarkers[countDown])
-          countDown--
-        }
-        else {
-          break
-        }
-      }
-      catch {
-        // skip to next
-      }
-    }
+
+    console.log(markers.length)
 
     initMap(markers)
   }
