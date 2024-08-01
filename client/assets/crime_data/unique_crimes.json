@@ -1,55 +1,55 @@
-[{
-  "Identity Theft": 1,
-  "Sound of Shots Fired (P)": 2,
-  "Motor Vehicle Theft": 3,
-  "Destruction/Damage/Vandalism of Property": 4,
-  "All Other Larceny": 5,
-  "Intimidation": 6,
-  "Weapon Law Violations": 7,
-  "Shooting (PFE)": 8,
-  "Aggravated Assault": 9,
-  "Gunshot Wound Victims": 10,
-  "Simple Assault": 11,
-  "Extortion/Blackmail": 12,
-  "Burglary/Breaking & Entering": 13,
-  "Credit Card/Automated Teller Machine Fraud": 14,
-  "Robbery": 15,
-  "Wire Fraud": 16,
-  "Pornography/Obscene Material": 17,
-  "Theft From Motor Vehicle": 18,
-  "Domestic Aggravated Assault - Subset of Assault": 19,
-  "Theft of Motor Vehicle Parts or Accessories": 20,
-  "Sex Offenses": 21,
-  "False Pretenses/Swindle/Confidence Game": 22,
-  "Drug/Narcotic Violations": 23,
-  "Counterfeiting/Forgery": 24,
-  "Theft From Building": 25,
-  "Carjacking - Subset of Robbery": 26,
-  "Stolen Property Offenses": 27,
-  "Drug Equipment Violations": 28,
-  "Kidnapping/Abduction": 29,
-  "Purse-snatching": 30,
-  "Embezzlement": 31,
-  "Shoplifting": 32,
-  "Shooting Report Only (P)": 33,
-  "Human Trafficking, Commercial Sex Acts": 34,
-  "Human Trafficking, Involuntary Servitude": 35,
-  "Theft From Coin-Operated Machine or Device": 36,
-  "Murder and Nonnegligent Manslaughter": 37,
-  "Arson": 38,
-  "Hacking/Computer Invasion": 39,
-  "Assisting or Promoting Prostitution": 40,
-  "Negligent Manslaughter": 41,
-  "Animal Cruelty": 42,
-  "Impersonation": 43,
-  "ShotSpotter Activation (P)": 44,
-  "Prostitution": 45,
-  "Bribery": 46,
-  "Pocket-picking": 47,
-  "Welfare Fraud": 48,
-  "Justifiable Homicide": 49,
-  "Operating/Promoting/Assisting Gambling": 50,
-  "Purchasing Prostitution": 51,
-  "Betting/Wagering": 52,
-  "Gambling Equipment Violations": 53
-  }]
+[
+  {"Identity Theft": "../../../assets/crime_icons/identity-theft.png"},{
+  "Sound of Shots Fired (P)": "../../../assets/crime_icons/shooting.png"},{
+  "Motor Vehicle Theft": "../../../assets/crime_icons/car-theft.png"},{
+  "Destruction/Damage/Vandalism of Property": "../../../assets/crime_icons/vandalism.png"},{
+  "All Other Larceny": "../../../assets/crime_icons/larceny.png"},{
+  "Intimidation": "../../../assets/crime_icons/general.png"},{
+  "Weapon Law Violations": "../../../assets/crime_icons/general.png"},{
+  "Shooting (PFE)": "../../../assets/crime_icons/shooting.png"},{
+  "Aggravated Assault": "../../../assets/crime_icons/assault.png"},{
+  "Gunshot Wound Victims": "../../../assets/crime_icons/shooting-victim.png"},{
+  "Simple Assault": "../../../assets/crime_icons/assault.png"},{
+  "Extortion/Blackmail": "../../../assets/crime_icons/general.png"},{
+  "Burglary/Breaking & Entering": "../../../assets/crime_icons/general.png"},{
+  "Credit Card/Automated Teller Machine Fraud": "../../../assets/crime_icons/general.png"},{
+  "Robbery": "../../../assets/crime_icons/general.png"},{
+  "Wire Fraud": "../../../assets/crime_icons/general.png"},{
+  "Pornography/Obscene Material": "../../../assets/crime_icons/general.png"},{
+  "Theft From Motor Vehicle": "../../../assets/crime_icons/general.png"},{
+  "Domestic Aggravated Assault - Subset of Assault": "../../../assets/crime_icons/assault.png"},{
+  "Theft of Motor Vehicle Parts or Accessories": "../../../assets/crime_icons/car-parts-theft.png"},{
+  "Sex Offenses": "../../../assets/crime_icons/general.png"},{
+  "False Pretenses/Swindle/Confidence Game": "../../../assets/crime_icons/general.png"},{
+  "Drug/Narcotic Violations": "../../../assets/crime_icons/drugs.png"},{
+  "Counterfeiting/Forgery": "../../../assets/crime_icons/general.png"},{
+  "Theft From Building": "../../../assets/crime_icons/general.png"},{
+  "Carjacking - Subset of Robbery": "../../../assets/crime_icons/general.png"},{
+  "Stolen Property Offenses": "../../../assets/crime_icons/general.png"},{
+  "Drug Equipment Violations": "../../../assets/crime_icons/drugs.png"},{
+  "Kidnapping/Abduction": "../../../assets/crime_icons/general.png"},{
+  "Purse-snatching": "../../../assets/crime_icons/general.png"},{
+  "Embezzlement": "../../../assets/crime_icons/general.png"},{
+  "Shoplifting": "../../../assets/crime_icons/general.png"},{
+  "Shooting Report Only (P)": "../../../assets/crime_icons/shooting.png"},{
+  "Human Trafficking},{ Commercial Sex Acts": "../../../assets/crime_icons/general.png"},{
+  "Human Trafficking},{ Involuntary Servitude": "../../../assets/crime_icons/general.png"},{
+  "Theft From Coin-Operated Machine or Device": "../../../assets/crime_icons/general.png"},{
+  "Murder and Nonnegligent Manslaughter": "../../../assets/crime_icons/murder.png"},{
+  "Arson": "../../../assets/crime_icons/arson.png"},{
+  "Hacking/Computer Invasion": "../../../assets/crime_icons/hacking.png"},{
+  "Assisting or Promoting Prostitution": "../../../assets/crime_icons/general.png"},{
+  "Negligent Manslaughter": "../../../assets/crime_icons/general.png"},{
+  "Animal Cruelty": "../../../assets/crime_icons/general.png"},{
+  "Impersonation": "../../../assets/crime_icons/general.png"},{
+  "ShotSpotter Activation (P)": "../../../assets/crime_icons/general.png"},{
+  "Prostitution": "../../../assets/crime_icons/general.png"},{
+  "Bribery": "../../../assets/crime_icons/general.png"},{
+  "Pocket-picking": "../../../assets/crime_icons/general.png"},{
+  "Welfare Fraud": "../../../assets/crime_icons/general.png"},{
+  "Justifiable Homicide": "../../../assets/crime_icons/general.png"},{
+  "Operating/Promoting/Assisting Gambling": "../../../assets/crime_icons/general.png"},{
+  "Purchasing Prostitution": "../../../assets/crime_icons/general.png"},{
+  "Betting/Wagering": "../../../assets/crime_icons/general.png"},{
+  "Gambling Equipment Violations": "../../../assets/crime_icons/general.png"}
+]
