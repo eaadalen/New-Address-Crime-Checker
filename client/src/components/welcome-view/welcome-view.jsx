@@ -15,11 +15,13 @@ import shooting from '../../../assets/crime_icons/shooting.png'
 import shooting_victim from '../../../assets/crime_icons/shooting-victim.png'
 import theft from '../../../assets/crime_icons/theft.png'
 import vandalism from '../../../assets/crime_icons/vandalism.png'
+import moment from 'moment';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
   let latitude = null
   let longitude = null
+  let crime_window = 7257600  // as a unix timestamp, default is one month
   let map;
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export const WelcomeView = () => {
       key: process.env.GOOGLE_MAPS_API_KEY_GENERATE_MAP,
       v: "weekly"
     })
+    moment().format();
   }, [])
 
   function binarySearchByLatitude(array, targetLatitude) {
@@ -56,6 +59,7 @@ export const WelcomeView = () => {
     let markers = []
     let glyphs = []
     let pinElements = []
+    var now = moment();
 
     map = new Map(document.getElementById("map"), {
       zoom: 15.75,
@@ -64,84 +68,87 @@ export const WelcomeView = () => {
     });
 
     markerArray.forEach((element) => {
-      /*markers.push(new AdvancedMarkerElement({
-        map: map,
-        position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) }
-      }))*/
-      glyphs.push(document.createElement("img"))
-      glyphs[index].style.height = '30px';
 
-      switch(element.Offense) {
-        case "Arson":
-          glyphs[index].src = arson
-          break;
-        case "Aggravated Assault":
-          glyphs[index].src = assault
-          break;
-        case "Simple Assault":
-          glyphs[index].src = assault
-          break;
-        case "Domestic Aggravated Assault - Subset of Assault":
-          glyphs[index].src = assault
-          break;
-        case "Theft of Motor Vehicle Parts or Accessories":
-          glyphs[index].src = car_parts_theft
-          break;
-        case "Motor Vehicle Theft":
-          glyphs[index].src = car_theft
-          break;
-        case "Drug/Narcotic Violations":
-          glyphs[index].src = drugs
-          break;
-        case "Drug Equipment Violations":
-          glyphs[index].src = drugs
-          break;
-        case "Hacking/Computer Invasion":
-          glyphs[index].src = hacking
-          break;
-        case "Identity Theft":
-          glyphs[index].src = identity_theft
-          break;
-        case "All Other Larceny":
-          glyphs[index].src = larceny
-          break;
-        case "Murder and Nonnegligent Manslaughter":
-          glyphs[index].src = murder
-          break;
-        case "Shooting (PFE)":
-          glyphs[index].src = shooting
-          break;
-        case "Shooting Report Only (P)":
-          glyphs[index].src = shooting
-          break;
-        case "Sound of Shots Fired (P)":
-          glyphs[index].src = shooting
-          break;
-        case "Gunshot Wound Victims":
-          glyphs[index].src = shooting_victim
-          break;
-        case "Destruction/Damage/Vandalism of Property":
-          glyphs[index].src = vandalism
-          break;
-        case "Theft From Coin-Operated Machine or Device":
-          glyphs[index].src = theft
-          break;
-        default:
-          glyphs[index].src = general
+      let date_time = element.Occurred_Date.split(' ')
+      let date = date_time[0].replace('/','')
+      date = date.replace('/','')
+
+      if (moment().unix() - moment(date).unix() < crime_window) {
+        glyphs.push(document.createElement("img"))
+        glyphs[index].style.height = '30px';
+
+        switch(element.Offense) {
+          case "Arson":
+            glyphs[index].src = arson
+            break;
+          case "Aggravated Assault":
+            glyphs[index].src = assault
+            break;
+          case "Simple Assault":
+            glyphs[index].src = assault
+            break;
+          case "Domestic Aggravated Assault - Subset of Assault":
+            glyphs[index].src = assault
+            break;
+          case "Theft of Motor Vehicle Parts or Accessories":
+            glyphs[index].src = car_parts_theft
+            break;
+          case "Motor Vehicle Theft":
+            glyphs[index].src = car_theft
+            break;
+          case "Drug/Narcotic Violations":
+            glyphs[index].src = drugs
+            break;
+          case "Drug Equipment Violations":
+            glyphs[index].src = drugs
+            break;
+          case "Hacking/Computer Invasion":
+            glyphs[index].src = hacking
+            break;
+          case "Identity Theft":
+            glyphs[index].src = identity_theft
+            break;
+          case "All Other Larceny":
+            glyphs[index].src = larceny
+            break;
+          case "Murder and Nonnegligent Manslaughter":
+            glyphs[index].src = murder
+            break;
+          case "Shooting (PFE)":
+            glyphs[index].src = shooting
+            break;
+          case "Shooting Report Only (P)":
+            glyphs[index].src = shooting
+            break;
+          case "Sound of Shots Fired (P)":
+            glyphs[index].src = shooting
+            break;
+          case "Gunshot Wound Victims":
+            glyphs[index].src = shooting_victim
+            break;
+          case "Destruction/Damage/Vandalism of Property":
+            glyphs[index].src = vandalism
+            break;
+          case "Theft From Coin-Operated Machine or Device":
+            glyphs[index].src = theft
+            break;
+          default:
+            glyphs[index].src = general
+        }
+
+        pinElements.push(new PinElement({
+          glyph: glyphs[index],
+          scale: 0
+        }))
+
+        markers.push(new AdvancedMarkerElement({
+          map,
+          position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) },
+          content: pinElements[index].element,
+        }))
+
+        index++
       }
-
-      pinElements.push(new PinElement({
-        glyph: glyphs[index],
-        scale: 0
-      }))
-
-      markers.push(new AdvancedMarkerElement({
-        map,
-        position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) },
-        content: pinElements[index].element,
-      }))
-
-      index++
       
     })
 
@@ -156,22 +163,6 @@ export const WelcomeView = () => {
       position: { lat: latitude, lng: longitude },
       content: pin.element
     })
-
-    const glyphImg = document.createElement("img");
-    glyphImg.src = murder
-    glyphImg.style.height = '60px';
-
-    const glyphSvgPinElement = new PinElement({
-      glyph: glyphImg,
-      scale: 0
-    });
-    const glyphSvgMarkerView = new AdvancedMarkerElement({
-      map,
-      position: { lat: latitude+0.0005, lng: longitude+0.0005 },
-      content: glyphSvgPinElement.element,
-      title: "A marker using a custom SVG for the glyph.",
-    });
-
     
   }
 
@@ -259,11 +250,23 @@ export const WelcomeView = () => {
     })
   }
 
+  const setCrimeWindow = (window) => {
+    crime_window = window
+  }
+
   return (
     <div className="form-group">
       <label>Enter New Address</label>
       <input type="email" className="form-control" value={address} onChange={handleInputChange} placeholder="Ex. 1234 Cherrywood Ln"></input>
       <button onClick={findAddress}>Submit</button>
+      <div>Show all crimes within last:</div>
+      <div className='crime-windows'>
+        <button onClick={() => setCrimeWindow(604800)}>Week</button>
+        <button onClick={() => setCrimeWindow(2419200)}>Month</button>
+        <button onClick={() => setCrimeWindow(7257600)}>3 months</button>
+        <button onClick={() => setCrimeWindow(14515200)}>6 months</button>
+        <button onClick={() => setCrimeWindow(29030400)}>Year</button>
+      </div>
       <div id="map"></div>
     </div>
   )

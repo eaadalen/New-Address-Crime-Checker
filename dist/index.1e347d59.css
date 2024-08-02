@@ -15,6 +15,10 @@
   height: 400px;
 }
 
+.crime-windows {
+  display: flex;
+}
+
 html {
   touch-action: manipulation;
   height: 100%;
