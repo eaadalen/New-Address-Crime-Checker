@@ -16,6 +16,13 @@ import shooting_victim from '../../../assets/crime_icons/shooting-victim.png'
 import theft from '../../../assets/crime_icons/theft.png'
 import vandalism from '../../../assets/crime_icons/vandalism.png'
 import moment from 'moment';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Stack from '@mui/material/Stack';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -23,6 +30,13 @@ export const WelcomeView = () => {
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
   let map;
+  const [week, setWeek] = useState("outlined")
+  const [month, setMonth] = useState("outlined")
+  const [three_months, setThreeMonths] = useState("contained")
+  const [six_months, setSixMonths] = useState("outlined")
+  const [year, setYear] = useState("outlined")
+  const [previous, setPrevious] = useState(7257600)
+  const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -247,27 +261,70 @@ export const WelcomeView = () => {
       latitude = data.result.geocode.location.latitude
       longitude = data.result.geocode.location.longitude
       getLatitudeCrimeMarkers(binarySearchByLatitude(crime_data, latitude))
+      setSubmitted(true)
     })
   }
 
   const setCrimeWindow = (window) => {
     crime_window = window
+    switch(window) {
+      case 604800:
+        setWeek("contained")
+        break;
+      case 2419200:
+        setMonth("contained")
+        break;
+      case 7257600:
+        setThreeMonths("contained")
+        break;
+      case 14515200:
+        setSixMonths("contained")
+        break;
+      case 29030400:
+        setYear("contained")
+        break;
+    }
+    switch(previous) {
+      case 604800:
+        setWeek("outlined")
+        break;
+      case 2419200:
+        setMonth("outlined")
+        break;
+      case 7257600:
+        setThreeMonths("outlined")
+        break;
+      case 14515200:
+        setSixMonths("outlined")
+        break;
+      case 29030400:
+        setYear("outlined")
+        break;
+    }
+    setPrevious(window)
+    findAddress()
   }
 
   return (
     <div className="form-group">
+      <CssBaseline />
+      <br></br>
       <label>Enter New Address</label>
       <input type="email" className="form-control" value={address} onChange={handleInputChange} placeholder="Ex. 1234 Cherrywood Ln"></input>
-      <button onClick={findAddress}>Submit</button>
-      <div>Show all crimes within last:</div>
-      <div className='crime-windows'>
-        <button onClick={() => setCrimeWindow(604800)}>Week</button>
-        <button onClick={() => setCrimeWindow(2419200)}>Month</button>
-        <button onClick={() => setCrimeWindow(7257600)}>3 months</button>
-        <button onClick={() => setCrimeWindow(14515200)}>6 months</button>
-        <button onClick={() => setCrimeWindow(29030400)}>Year</button>
-      </div>
-      <div id="map"></div>
+      <Button variant="contained" onClick={findAddress}>Submit</Button>
+      {(submitted == true) && 
+        <>
+          <div>Show all crimes within last:</div>
+          <Stack sx={{ width: '500px' }} spacing={2} direction="row">
+            <Button variant={week} onClick={() => setCrimeWindow(604800)}>Week</Button>
+            <Button variant={month} onClick={() => setCrimeWindow(2419200)}>Month</Button>
+            <Button variant={three_months} onClick={() => setCrimeWindow(7257600)}>3 months</Button>
+            <Button variant={six_months} onClick={() => setCrimeWindow(14515200)}>6 months</Button>
+            <Button variant={year} onClick={() => setCrimeWindow(29030400)}>Year</Button>
+          </Stack>
+          <div id="map"></div>
+        </>
+      }
     </div>
   )
 }
