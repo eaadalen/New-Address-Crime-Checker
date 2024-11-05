@@ -1,6 +1,6 @@
 import "./welcome-view.css"
 import { useState, useEffect } from "react";
-import crime_data from '../../../assets/crime_data/sorted_crime_data.json'
+import crime_data from '../../../assets/crime_data/json/sorted_crime_data.json'
 import arson from '../../../assets/crime_icons/arson.png'
 import assault from '../../../assets/crime_icons/assault.png'
 import car_parts_theft from '../../../assets/crime_icons/car-parts-theft.png'

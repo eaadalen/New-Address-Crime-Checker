@@ -23,6 +23,7 @@ const quicksort = (arr, key) => {
 
 function sorter() {
   return new Promise((resolve) => {
+    console.log('sorter')
     const sortedData = quicksort(crime_data, 'Latitude');
     const jsonString = JSON.stringify(sortedData, null, 2);
 
@@ -35,7 +36,5 @@ function sorter() {
     });
   });
 }
-
-sorter()
 
 module.exports = sorter
