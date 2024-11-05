@@ -1,2 +1,3 @@
 -make responsive design. Have different layout for mobile vs desktop
--move crime data storage to backend
+-move crime data storage to backend for improved loading speed
+-have backend update crime data every week

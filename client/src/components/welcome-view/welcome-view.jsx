@@ -258,6 +258,7 @@ export const WelcomeView = () => {
     )
     .then((response) => response.json())
     .then((data) => {
+      console.log(data)
       latitude = data.result.geocode.location.latitude
       longitude = data.result.geocode.location.longitude
       getLatitudeCrimeMarkers(binarySearchByLatitude(crime_data, latitude))
