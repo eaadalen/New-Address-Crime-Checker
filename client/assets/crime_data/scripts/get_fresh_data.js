@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 async function downloadCrimeData() {
     // Launch a new browser instance
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script
@@ -23,7 +23,6 @@ async function downloadCrimeData() {
     const svgElement = await page.$('svg#ember114');
     if (svgElement) {
         await svgElement.click({ force: true });
-        console.log("SVG clicked successfully.");
     } else {
         console.log("SVG not found.");
         await browser.close();
@@ -46,13 +45,13 @@ async function downloadCrimeData() {
     if (csvDownloadButton) {
         // Click the button
         await csvDownloadButton.click({ force: true });
-        console.log("CSV download button clicked.");
+        console.log("CSV Download Initiated");
     } else {
         console.log("CSV download button not found.");
     }
 
     // Keep the browser open for a few seconds to allow time for the download
-    await new Promise(resolve => setTimeout(resolve, 20000));
+    await new Promise(resolve => setTimeout(resolve, 10000));
 
     // Close the browser
     await browser.close();

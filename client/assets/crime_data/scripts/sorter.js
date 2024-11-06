@@ -23,17 +23,19 @@ const quicksort = (arr, key) => {
 
 function sorter() {
   return new Promise((resolve) => {
-    console.log('sorter')
+
     const sortedData = quicksort(crime_data, 'Latitude');
     const jsonString = JSON.stringify(sortedData, null, 2);
 
-    fs.writeFile('../json/sorted_crime_data.json', jsonString, (err) => {
+    fs.writeFile('./json/sorted_crime_data.json', jsonString, (err) => {
       if (err) {
         console.error('Error writing to file:', err);
       } else {
-        console.log('File has been written successfully');
+        console.log('JSON Object has been sorted according to Latitude and saved at ./json/sorted_crime_data.json');
       }
     });
+
+    resolve()
   });
 }
 
