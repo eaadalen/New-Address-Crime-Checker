@@ -1,6 +1,5 @@
 import "./welcome-view.css"
 import { useState, useEffect } from "react";
-import crime_data from '../../../assets/crime_data/json/sorted_crime_data.json'
 import arson from '../../../assets/crime_icons/arson.png'
 import assault from '../../../assets/crime_icons/assault.png'
 import car_parts_theft from '../../../assets/crime_icons/car-parts-theft.png'
@@ -46,24 +45,48 @@ export const WelcomeView = () => {
     moment().format();
   }, [])
 
-  function binarySearchByLatitude(array, targetLatitude) {
-    let low = 0;
-    let high = array.length - 1;
-  
-    while (true) {
-      const midIndex = Math.floor((low + high) / 2);
-      const midItem = array[midIndex];
-  
-      if (midItem.Latitude < targetLatitude) {
-        low = midIndex + 1; // Search in the right half
-      } else {
-        high = midIndex - 1; // Search in the left half
-      }
+  function binarySearchByLatitude() {
 
-      if (low > high) {
-        return midIndex
-      }
+    const data = {
+      "latitude": latitude
     }
+
+    fetch('http://localhost:4242/binarysearch',
+      {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+      }
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      getMarkerCoordinates(data)
+    })
+  }
+
+  const getMarkerCoordinates = (midIndex) => {
+
+    const data = {
+      "midIndex": midIndex,
+      "longitude": longitude
+    }
+
+    fetch('http://localhost:4242/coordinates',
+      {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+      }
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      initMap(data)
+    })
+
   }
 
   async function initMap(markerArray) {
@@ -180,61 +203,6 @@ export const WelcomeView = () => {
     
   }
 
-  const getLatitudeCrimeMarkers = (midIndex) => {
-    let countUp = midIndex
-    let countDown = midIndex
-    let markers = []
-    while (true) {
-      try {
-        if (crime_data[countUp].Latitude - crime_data[midIndex].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
-          markers.push(crime_data[countUp])
-          countUp++
-        }
-        else {
-          break
-        }
-      }
-      catch {
-        // skip to next
-      }
-    }
-    while (true) {
-      try {
-        if (crime_data[midIndex].Latitude - crime_data[countDown].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
-          markers.push(crime_data[countDown])
-          countDown--
-        }
-        else {
-          break
-        }
-      }
-      catch {
-        // skip to next
-      }
-    }
-
-    getLongitudeCrimeMarkers(markers)
-  }
-
-  const getLongitudeCrimeMarkers = (latitudeMarkers) => {
-    let index = 0
-    let markers = []
-    while (index < latitudeMarkers.length) {
-      index++
-      try {
-        if (Math.abs(latitudeMarkers[index].Longitude - longitude) < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
-          markers.push(latitudeMarkers[index])
-          index++
-        }
-      }
-      catch {
-        // skip
-      }
-    }
-
-    initMap(markers)
-  }
-
   const handleInputChange = (event) => {
     setAddress(event.target.value);
   };
@@ -258,10 +226,9 @@ export const WelcomeView = () => {
     )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data)
       latitude = data.result.geocode.location.latitude
       longitude = data.result.geocode.location.longitude
-      getLatitudeCrimeMarkers(binarySearchByLatitude(crime_data, latitude))
+      binarySearchByLatitude()
       setSubmitted(true)
     })
   }
@@ -311,8 +278,10 @@ export const WelcomeView = () => {
       <CssBaseline />
       <br></br>
       <label>Enter New Address</label>
-      <input type="email" className="form-control" value={address} onChange={handleInputChange} placeholder="Ex. 1234 Cherrywood Ln"></input>
-      <Button variant="contained" onClick={findAddress}>Submit</Button>
+      <div>
+        <input type="email" className="form-control" value={address} onChange={handleInputChange} placeholder="Ex. 1234 Cherrywood Ln"></input>
+        <Button variant="contained" onClick={findAddress}>Submit</Button>
+      </div>
       {(submitted == true) && 
         <>
           <div>Show all crimes within last:</div>
