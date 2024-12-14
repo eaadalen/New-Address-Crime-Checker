@@ -22,6 +22,16 @@ import '@fontsource/roboto/700.css';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
+import React from 'react';
+import { 
+  Container, 
+  Typography, 
+  TextField, 
+  Button, 
+  Box, 
+  Stack, 
+  CssBaseline 
+} from '@mui/material';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -29,14 +39,8 @@ export const WelcomeView = () => {
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
   let map;
-  const [week, setWeek] = useState("outlined")
-  const [month, setMonth] = useState("outlined")
-  const [three_months, setThreeMonths] = useState("contained")
-  const [six_months, setSixMonths] = useState("outlined")
-  const [year, setYear] = useState("outlined")
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
-  let coordinate_data = null
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -46,10 +50,12 @@ export const WelcomeView = () => {
     moment().format();
   }, [])
 
+  const handleSubmit = () => {
+    crime_window = previous
+    findAddress()
+  }
+
   const findAddress = () => {
-
-
-
     const data = {
       "address" : {
         "regionCode": "US",
@@ -241,68 +247,125 @@ export const WelcomeView = () => {
   };
 
   const setCrimeWindow = (window) => {
-    console.log(window)
+    if (window === previous) {
+      return
+    }
     crime_window = window
-    switch(window) {
-      case 604800:
-        setWeek("contained")
-        break;
-      case 2419200:
-        setMonth("contained")
-        break;
-      case 7257600:
-        setThreeMonths("contained")
-        break;
-      case 14515200:
-        setSixMonths("contained")
-        break;
-      case 29030400:
-        setYear("contained")
-        break;
-    }
-    switch(previous) {
-      case 604800:
-        setWeek("outlined")
-        break;
-      case 2419200:
-        setMonth("outlined")
-        break;
-      case 7257600:
-        setThreeMonths("outlined")
-        break;
-      case 14515200:
-        setSixMonths("outlined")
-        break;
-      case 29030400:
-        setYear("outlined")
-        break;
-    }
     setPrevious(window)
     findAddress()
   }
 
+  const getVariant = (windowSeconds) => {
+    return previous === windowSeconds ? 'contained' : 'outlined';
+  }
+
   return (
-    <div className="form-group">
+    <Container maxWidth="sm">
       <CssBaseline />
-      <br></br>
-      <label>Enter New Address</label>
-      <div>
-        <input type="email" className="form-control" value={address} onChange={handleInputChange} placeholder="Ex. 1234 Cherrywood Ln"></input>
-        <Button variant="contained" onClick={findAddress}>Submit</Button>
-      </div>
-      {(submitted == true) && 
-        <>
-          <div>Show all crimes within last:</div>
-          <Stack sx={{ width: '500px' }} spacing={2} direction="row">
-            <Button variant={week} onClick={() => setCrimeWindow(604800)}>Week</Button>
-            <Button variant={month} onClick={() => setCrimeWindow(2419200)}>Month</Button>
-            <Button variant={three_months} onClick={() => setCrimeWindow(7257600)}>3 months</Button>
-            <Button variant={six_months} onClick={() => setCrimeWindow(14515200)}>6 months</Button>
-            <Button variant={year} onClick={() => setCrimeWindow(29030400)}>Year</Button>
-          </Stack>
-          <div id="map"></div>
-        </>
-      }
-    </div>
+      <Box 
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          textAlign: 'center',
+          p: 3
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Enter New Address
+        </Typography>
+        
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            width: '100%', 
+            gap: 2, 
+            justifyContent: 'center',
+            mb: 3 
+          }}
+        >
+          <TextField
+            type="email"
+            variant="outlined"
+            value={address}
+            onChange={handleInputChange}
+            placeholder="Ex. 1234 Cherrywood Ln"
+            sx={{ flexGrow: 1, maxWidth: 400 }}
+          />
+          <Button 
+            variant="contained" 
+            onClick={handleSubmit}
+            sx={{ height: '56px' }}
+          >
+            Submit
+          </Button>
+        </Box>
+
+        {submitted && (
+          <Box sx={{ width: '100%', maxWidth: 600 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Show all crimes within last:
+            </Typography>
+            
+            <Stack 
+              spacing={2} 
+              direction="row" 
+              justifyContent="center"
+              sx={{ mb: 3 }}
+            >
+              <Button 
+                variant={getVariant(604800)} 
+                onClick={() => setCrimeWindow(604800)}
+              >
+                Week
+              </Button>
+              <Button 
+                variant={getVariant(2419200)} 
+                onClick={() => setCrimeWindow(2419200)}
+              >
+                Month
+              </Button>
+              <Button 
+                variant={getVariant(7257600)} 
+                onClick={() => setCrimeWindow(7257600)}
+              >
+                3 months
+              </Button>
+              <Button 
+                variant={getVariant(14515200)} 
+                onClick={() => setCrimeWindow(14515200)}
+              >
+                6 months
+              </Button>
+              <Button 
+                variant={getVariant(29030400)} 
+                onClick={() => setCrimeWindow(29030400)}
+              >
+                Year
+              </Button>
+            </Stack>
+
+            <Box 
+              id="map" 
+              sx={{ 
+                width: '100%', 
+                maxWidth: 600,
+                height: 400, 
+                backgroundColor: '#f0f0f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Typography variant="body1" color="textSecondary">
+                Map Placeholder
+              </Typography>
+            </Box>
+          </Box>
+        )}
+      </Box>
+    </Container>
   )
 }
