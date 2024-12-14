@@ -36,6 +36,7 @@ export const WelcomeView = () => {
   const [year, setYear] = useState("outlined")
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
+  let coordinate_data = null
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -44,6 +45,35 @@ export const WelcomeView = () => {
     })
     moment().format();
   }, [])
+
+  const findAddress = () => {
+
+
+
+    const data = {
+      "address" : {
+        "regionCode": "US",
+        "locality": "Minneapolis",
+        "addressLines": [address]
+      }
+    }
+    fetch('https://addressvalidation.googleapis.com/v1:validateAddress?key=' + process.env.GOOGLE_MAPS_API_KEY_GET_COORDINATES,
+      {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+      }
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      latitude = data.result.geocode.location.latitude
+      longitude = data.result.geocode.location.longitude
+      binarySearchByLatitude()
+      setSubmitted(true)
+    })
+  }
 
   function binarySearchByLatitude() {
 
@@ -85,11 +115,13 @@ export const WelcomeView = () => {
     .then((response) => response.json())
     .then((data) => {
       initMap(data)
+      coordinate_data = data
     })
 
   }
 
   async function initMap(markerArray) {
+
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     let index = 0
@@ -109,6 +141,7 @@ export const WelcomeView = () => {
       let date_time = element.Occurred_Date.split(' ')
       let date = date_time[0].replace('/','')
       date = date.replace('/','')
+
 
       if (moment().unix() - moment(date).unix() < crime_window) {
         glyphs.push(document.createElement("img"))
@@ -207,33 +240,8 @@ export const WelcomeView = () => {
     setAddress(event.target.value);
   };
 
-  const findAddress = () => {
-    const data = {
-      "address" : {
-        "regionCode": "US",
-        "locality": "Minneapolis",
-        "addressLines": [address]
-      }
-    }
-    fetch('https://addressvalidation.googleapis.com/v1:validateAddress?key=' + process.env.GOOGLE_MAPS_API_KEY_GET_COORDINATES,
-      {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
-      }
-    )
-    .then((response) => response.json())
-    .then((data) => {
-      latitude = data.result.geocode.location.latitude
-      longitude = data.result.geocode.location.longitude
-      binarySearchByLatitude()
-      setSubmitted(true)
-    })
-  }
-
   const setCrimeWindow = (window) => {
+    console.log(window)
     crime_window = window
     switch(window) {
       case 604800:

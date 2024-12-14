@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 async function downloadCrimeData() {
     // Launch a new browser instance
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script
@@ -51,7 +51,7 @@ async function downloadCrimeData() {
     }
 
     // Keep the browser open for a few seconds to allow time for the download
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 25000));
 
     // Close the browser
     await browser.close();

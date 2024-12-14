@@ -1,3 +1,4 @@
 -make responsive design. Have different layout for mobile vs desktop
--move crime data storage to backend for improved loading speed
 -have backend update crime data every week
+-fix button second click error (highlighted time window button loses highlight if clicked a second time)
+-fix new address entry bug (time window resets to 3 months when new address is submitted, but time window buttons don't update accordingly)

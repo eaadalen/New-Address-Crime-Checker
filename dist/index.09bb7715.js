@@ -73202,6 +73202,7 @@ const WelcomeView = ()=>{
     const [year, setYear] = (0, _react.useState)("outlined");
     const [previous, setPrevious] = (0, _react.useState)(7257600);
     const [submitted, setSubmitted] = (0, _react.useState)(false);
+    let coordinate_data = null;
     (0, _react.useEffect)(()=>{
         ((g)=>{
             var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
@@ -73226,6 +73227,29 @@ const WelcomeView = ()=>{
         });
         (0, _momentDefault.default)().format();
     }, []);
+    const findAddress = ()=>{
+        const data = {
+            "address": {
+                "regionCode": "US",
+                "locality": "Minneapolis",
+                "addressLines": [
+                    address
+                ]
+            }
+        };
+        fetch("https://addressvalidation.googleapis.com/v1:validateAddress?key=AIzaSyAVkOWZ_t-b51WTp9-sO5N0o7JV851nkQE", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        }).then((response)=>response.json()).then((data)=>{
+            latitude = data.result.geocode.location.latitude;
+            longitude = data.result.geocode.location.longitude;
+            binarySearchByLatitude();
+            setSubmitted(true);
+        });
+    };
     function binarySearchByLatitude() {
         const data = {
             "latitude": latitude
@@ -73253,6 +73277,7 @@ const WelcomeView = ()=>{
             body: JSON.stringify(data)
         }).then((response)=>response.json()).then((data)=>{
             initMap(data);
+            coordinate_data = data;
         });
     };
     async function initMap(markerArray) {
@@ -73369,30 +73394,8 @@ const WelcomeView = ()=>{
     const handleInputChange = (event)=>{
         setAddress(event.target.value);
     };
-    const findAddress = ()=>{
-        const data = {
-            "address": {
-                "regionCode": "US",
-                "locality": "Minneapolis",
-                "addressLines": [
-                    address
-                ]
-            }
-        };
-        fetch("https://addressvalidation.googleapis.com/v1:validateAddress?key=AIzaSyAVkOWZ_t-b51WTp9-sO5N0o7JV851nkQE", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }).then((response)=>response.json()).then((data)=>{
-            latitude = data.result.geocode.location.latitude;
-            longitude = data.result.geocode.location.longitude;
-            binarySearchByLatitude();
-            setSubmitted(true);
-        });
-    };
     const setCrimeWindow = (window1)=>{
+        console.log(window1);
         crime_window = window1;
         switch(window1){
             case 604800:
@@ -73436,19 +73439,19 @@ const WelcomeView = ()=>{
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _cssBaselineDefault.default), {}, void 0, false, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 278,
+                lineNumber: 286,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("br", {}, void 0, false, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 279,
+                lineNumber: 287,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("label", {
                 children: "Enter New Address"
             }, void 0, false, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 280,
+                lineNumber: 288,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
@@ -73461,7 +73464,7 @@ const WelcomeView = ()=>{
                         placeholder: "Ex. 1234 Cherrywood Ln"
                     }, void 0, false, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 282,
+                        lineNumber: 290,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -73470,13 +73473,13 @@ const WelcomeView = ()=>{
                         children: "Submit"
                     }, void 0, false, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 283,
+                        lineNumber: 291,
                         columnNumber: 9
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 281,
+                lineNumber: 289,
                 columnNumber: 7
             }, undefined),
             submitted == true && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _jsxDevRuntime.Fragment), {
@@ -73485,7 +73488,7 @@ const WelcomeView = ()=>{
                         children: "Show all crimes within last:"
                     }, void 0, false, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 287,
+                        lineNumber: 295,
                         columnNumber: 11
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _stackDefault.default), {
@@ -73501,7 +73504,7 @@ const WelcomeView = ()=>{
                                 children: "Week"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 289,
+                                lineNumber: 297,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -73510,7 +73513,7 @@ const WelcomeView = ()=>{
                                 children: "Month"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 290,
+                                lineNumber: 298,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -73519,7 +73522,7 @@ const WelcomeView = ()=>{
                                 children: "3 months"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 291,
+                                lineNumber: 299,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -73528,7 +73531,7 @@ const WelcomeView = ()=>{
                                 children: "6 months"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 292,
+                                lineNumber: 300,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _buttonDefault.default), {
@@ -73537,20 +73540,20 @@ const WelcomeView = ()=>{
                                 children: "Year"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 293,
+                                lineNumber: 301,
                                 columnNumber: 13
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 288,
+                        lineNumber: 296,
                         columnNumber: 11
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
                         id: "map"
                     }, void 0, false, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 295,
+                        lineNumber: 303,
                         columnNumber: 11
                     }, undefined)
                 ]
@@ -73558,7 +73561,7 @@ const WelcomeView = ()=>{
         ]
     }, void 0, true, {
         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-        lineNumber: 277,
+        lineNumber: 285,
         columnNumber: 5
     }, undefined);
 };
