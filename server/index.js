@@ -40,7 +40,7 @@ app.post('/coordinates', bodyParser.json(), (req, res) => {
   let latitude_markers = []
   while (true) {
     try {
-      if (crime_data[countUp].Latitude - crime_data[req.body.midIndex].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
+      if (crime_data[countUp].Latitude - crime_data[req.body.midIndex].Latitude < 0.0057968) { // 0.0057968 change in latitude is equal to 0.4 miles
         latitude_markers.push(crime_data[countUp])
         countUp++
       }
@@ -54,7 +54,7 @@ app.post('/coordinates', bodyParser.json(), (req, res) => {
   }
   while (true) {
     try {
-      if (crime_data[req.body.midIndex].Latitude - crime_data[countDown].Latitude < 0.003623) { // 0.003623 change in latitude is equal to 0.25 miles
+      if (crime_data[req.body.midIndex].Latitude - crime_data[countDown].Latitude < 0.0057968) { // 0.0057968 change in latitude is equal to 0.4 miles
         latitude_markers.push(crime_data[countDown])
         countDown--
       }
@@ -72,7 +72,7 @@ app.post('/coordinates', bodyParser.json(), (req, res) => {
   while (index < latitude_markers.length) {
     index++
     try {
-      if (Math.abs(latitude_markers[index].Longitude - req.body.longitude) < 0.00457) { // 0.00457 change in longitude is equal to 0.25 miles
+      if (Math.abs(latitude_markers[index].Longitude - req.body.longitude) < 0.007312) { // 0.007312 change in longitude is equal to 0.4 miles
         longitude_markers.push(latitude_markers[index])
         index++
       }

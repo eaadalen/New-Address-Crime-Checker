@@ -1,5 +1,5 @@
 import "./welcome-view.css"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import arson from '../../../assets/crime_icons/arson.png'
 import assault from '../../../assets/crime_icons/assault.png'
 import car_parts_theft from '../../../assets/crime_icons/car-parts-theft.png'
@@ -30,8 +30,11 @@ import {
   Button, 
   Box, 
   Stack, 
-  CssBaseline 
+  CssBaseline,
+  IconButton  
 } from '@mui/material';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('2201 Blaisdell Ave')
@@ -259,6 +262,20 @@ export const WelcomeView = () => {
     return previous === windowSeconds ? 'contained' : 'outlined';
   }
 
+  const boxRef = useRef(null);
+
+  const handleScrollUp = () => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop -= 40; // Scroll up by one image height
+    }
+  };
+
+  const handleScrollDown = () => {
+    if (boxRef.current) {
+      boxRef.current.scrollTop += 40; // Scroll down by one image height
+    }
+  };
+
   return (
     <Container maxWidth="sm">
       <CssBaseline />
@@ -348,24 +365,101 @@ export const WelcomeView = () => {
             </Stack>
 
             <Box 
-              id="map" 
               sx={{ 
-                width: '100%', 
-                maxWidth: 600,
-                height: 400, 
-                backgroundColor: '#f0f0f0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                display: 'flex', 
+                width: '100%',
+                alignItems: 'flex-start',
+                gap: 4
               }}
             >
-              <Typography variant="body1" color="textSecondary">
-                Map Placeholder
-              </Typography>
+              <Box 
+                id="map" 
+                sx={{ 
+                  width: '100%', 
+                  maxWidth: 400,
+                  height: 400, 
+                  backgroundColor: '#f0f0f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <Typography variant="body1" color="textSecondary">
+                  Map Placeholder
+                </Typography>
+              </Box>
+              <Box 
+                sx={{ 
+                  position: 'relative', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  maxHeight: '200px', 
+                  overflow: 'hidden' 
+                }}
+              >
+                <IconButton 
+                  onClick={handleScrollUp}
+                  sx={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    zIndex: 1, 
+                    width: '100%', 
+                    borderRadius: 1 
+                  }}
+                >
+                  <KeyboardArrowUpIcon />
+                </IconButton>
+                
+                <Box 
+                  ref={boxRef}
+                  sx={{ 
+                    overflowY: 'scroll', 
+                    scrollbarWidth: 'none', // For Firefox
+                    '&::-webkit-scrollbar': {
+                      display: 'none' // For Chrome, Safari, and Opera
+                    },
+                    height: '100%',
+                    width: '100%',
+                    paddingTop: '40px', // Space for top arrow
+                    paddingBottom: '40px', // Space for bottom arrow
+                    maxHeight: '200px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}
+                >
+                  <img src={arson} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={assault} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={car_parts_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={car_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={drugs} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={general} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={hacking} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={identity_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={larceny} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={murder} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={shooting} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={shooting_victim} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <img src={vandalism} height="40" style={{ marginBottom: '10px' }} /> 
+                </Box>
+                
+                <IconButton 
+                  onClick={handleScrollDown}
+                  sx={{ 
+                    position: 'absolute', 
+                    bottom: 0, 
+                    zIndex: 1, 
+                    width: '100%', 
+                    borderRadius: 1 
+                  }}
+                >
+                  <KeyboardArrowDownIcon />
+                </IconButton>
+              </Box>
             </Box>
           </Box>
-
-          
         )}
       </Box>
     </Container>
