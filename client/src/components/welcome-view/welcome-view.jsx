@@ -364,6 +364,8 @@ export const WelcomeView = () => {
               </Typography>
             </Box>
           </Box>
+
+          
         )}
       </Box>
     </Container>
