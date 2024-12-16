@@ -31,7 +31,8 @@ import {
   Box, 
   Stack, 
   CssBaseline,
-  IconButton  
+  IconButton,
+  Tooltip  
 } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -263,16 +264,18 @@ export const WelcomeView = () => {
   }
 
   const boxRef = useRef(null);
+  const iconRefUp = useRef(null);
+  const iconRefDown = useRef(null);
 
   const handleScrollUp = () => {
     if (boxRef.current) {
-      boxRef.current.scrollTop -= 40; // Scroll up by one image height
+      boxRef.current.scrollTop -= 2; // Scroll up by one image height
     }
   };
 
   const handleScrollDown = () => {
     if (boxRef.current) {
-      boxRef.current.scrollTop += 40; // Scroll down by one image height
+      boxRef.current.scrollTop += 2; // Scroll down by one image height
     }
   };
 
@@ -394,18 +397,38 @@ export const WelcomeView = () => {
                   display: 'flex', 
                   flexDirection: 'column', 
                   alignItems: 'center', 
-                  maxHeight: '200px', 
+                  maxHeight: '400px', 
                   overflow: 'hidden' 
                 }}
               >
                 <IconButton 
-                  onClick={handleScrollUp}
+                  onMouseEnter={() => {
+                    // Start the interval when mouse enters
+                    const intervalId = setInterval(handleScrollUp, 10);
+                    
+                    // Create a cleanup function for when mouse leaves
+                    const handleMouseLeave = () => {
+                      clearInterval(intervalId);
+                      // Remove the event listener to prevent memory leaks
+                      iconRefUp.current.removeEventListener('mouseleave', handleMouseLeave);
+                    };
+                    
+                    // Use a ref to manage the event listener
+                    iconRefUp.current.addEventListener('mouseleave', handleMouseLeave);
+                  }}
+                  ref={iconRefUp}
                   sx={{ 
                     position: 'absolute', 
                     top: 0, 
                     zIndex: 1, 
                     width: '100%', 
-                    borderRadius: 1 
+                    borderRadius: 1,
+                    opacity: 1,
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      opacity: 1,
+                      backgroundColor: 'white'
+                    }
                   }}
                 >
                   <KeyboardArrowUpIcon />
@@ -423,36 +446,85 @@ export const WelcomeView = () => {
                     width: '100%',
                     paddingTop: '40px', // Space for top arrow
                     paddingBottom: '40px', // Space for bottom arrow
-                    maxHeight: '200px',
+                    maxHeight: '400px',
                     display: 'flex',
+                    zIndex: 0, 
                     flexDirection: 'column',
                     alignItems: 'center'
                   }}
                 >
-                  <img src={arson} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={assault} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={car_parts_theft} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={car_theft} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={drugs} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={general} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={hacking} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={identity_theft} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={larceny} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={murder} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={shooting} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={shooting_victim} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={theft} height="40" style={{ marginBottom: '10px' }} /> 
-                  <img src={vandalism} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Arson" placement="right">
+                    <img src={arson} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Assault" placement="right">
+                    <img src={assault} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Car Parts Theft" placement="right">
+                    <img src={car_parts_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Car Theft" placement="right">
+                    <img src={car_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Drugs" placement="right">
+                    <img src={drugs} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="General" placement="right">
+                    <img src={general} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Hacking" placement="right">
+                    <img src={hacking} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Identity Theft" placement="right">
+                    <img src={identity_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Larceny" placement="right">
+                    <img src={larceny} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Murder" placement="right">
+                    <img src={murder} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Shooting" placement="right">
+                    <img src={shooting} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Shooting Victim" placement="right">
+                    <img src={shooting_victim} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Theft" placement="right">
+                    <img src={theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
+                  <Tooltip title="Vandalism" placement="right">
+                    <img src={vandalism} height="40" style={{ marginBottom: '10px' }} /> 
+                  </Tooltip>
                 </Box>
                 
                 <IconButton 
-                  onClick={handleScrollDown}
+                  onMouseEnter={() => {
+                    // Start the interval when mouse enters
+                    const intervalId = setInterval(handleScrollDown, 5);
+                    
+                    // Create a cleanup function for when mouse leaves
+                    const handleMouseLeave = () => {
+                      clearInterval(intervalId);
+                      // Remove the event listener to prevent memory leaks
+                      iconRefDown.current.removeEventListener('mouseleave', handleMouseLeave);
+                    };
+                    
+                    // Use a ref to manage the event listener
+                    iconRefDown.current.addEventListener('mouseleave', handleMouseLeave);
+                  }}
+                  ref={iconRefDown}
                   sx={{ 
                     position: 'absolute', 
                     bottom: 0, 
                     zIndex: 1, 
                     width: '100%', 
-                    borderRadius: 1 
+                    borderRadius: 1,
+                    opacity: 1,
+                    backgroundColor: 'white',
+                    '&:hover': {
+                      opacity: 1,
+                      backgroundColor: 'white'
+                    }
                   }}
                 >
                   <KeyboardArrowDownIcon />
