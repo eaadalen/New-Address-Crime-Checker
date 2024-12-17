@@ -1,4 +1,6 @@
-const crime_data = require(__dirname + '/Crime_Data.json');
+let downloadPath = __dirname.replace("scripts", "") + "json"; // Escape backslashes
+
+const crime_data = require(downloadPath + '/Crime_Data.json');
 const fs = require('fs');
 
 const quicksort = (arr, key) => {
