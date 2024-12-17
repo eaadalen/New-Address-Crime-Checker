@@ -119,4 +119,15 @@ app.use((err, req, res, next) => {
   console.log('Listening on Port ' + port)
 })*/
 
+const refresh_crime_data = require('../client/assets/crime_data/refresh_crime_data.js')
+
+const cron = require('node-cron');
+
+// Update crime data every day at midnight (00:00)
+cron.schedule('0 0 * * *', () => {
+  console.log('Updating crime data');
+  refresh_crime_data()
+});
+
+
 app.listen(4242, () => console.log('Running on port 4242'))

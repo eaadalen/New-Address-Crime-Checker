@@ -45,6 +45,7 @@ export const WelcomeView = () => {
   let map;
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
+  const infoWindowRef = useRef(null);
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -134,8 +135,9 @@ export const WelcomeView = () => {
 
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    const infoWindow = new window.google.maps.InfoWindow();
+    infoWindowRef.current = infoWindow;
     let index = 0
-    let markers = []
     let glyphs = []
     let pinElements = []
     var now = moment();
@@ -221,11 +223,26 @@ export const WelcomeView = () => {
           scale: 0
         }))
 
-        markers.push(new AdvancedMarkerElement({
+        const marker = new AdvancedMarkerElement({
           map,
           position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) },
           content: pinElements[index].element,
-        }))
+        })
+
+        // Add click event to show info window
+        marker.addListener('mouseover', () => {
+          infoWindow.setContent(`
+            <div>
+              <h3>${element.Offense}</h3>
+            </div>
+          `);
+          infoWindow.open(map, marker);
+        });
+
+        // Optional: Close info window when mouse moves away
+        marker.addListener('mouseout', () => {
+          infoWindow.close();
+        });
 
         index++
       }
@@ -391,6 +408,7 @@ export const WelcomeView = () => {
                   Map Placeholder
                 </Typography>
               </Box>
+              
               <Box 
                 sx={{ 
                   position: 'relative', 
@@ -468,7 +486,7 @@ export const WelcomeView = () => {
                   <Tooltip title="Drugs" placement="right">
                     <img src={drugs} height="40" style={{ marginBottom: '10px' }} /> 
                   </Tooltip>
-                  <Tooltip title="General" placement="right">
+                  <Tooltip title="Miscellaneous" placement="right">
                     <img src={general} height="40" style={{ marginBottom: '10px' }} /> 
                   </Tooltip>
                   <Tooltip title="Hacking" placement="right">
@@ -529,6 +547,7 @@ export const WelcomeView = () => {
                 >
                   <KeyboardArrowDownIcon />
                 </IconButton>
+
               </Box>
             </Box>
           </Box>
