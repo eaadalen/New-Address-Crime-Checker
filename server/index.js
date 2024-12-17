@@ -115,9 +115,9 @@ app.use((err, req, res, next) => {
 })
 
 // listen for requests
-/*app.listen(port, '0.0.0.0',() => {
+app.listen(port, '0.0.0.0',() => {
   console.log('Listening on Port ' + port)
-})*/
+})
 
 const refresh_crime_data = require('../client/assets/crime_data/refresh_crime_data.js')
 
@@ -130,4 +130,4 @@ cron.schedule('0 0 * * *', () => {
 });
 
 
-app.listen(4242, () => console.log('Running on port 4242'))
+//app.listen(4242, () => console.log('Running on port 4242'))
