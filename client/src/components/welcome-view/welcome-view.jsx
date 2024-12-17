@@ -92,7 +92,7 @@ export const WelcomeView = () => {
       "latitude": latitude
     }
 
-    fetch('http://localhost:4242/binarysearch',
+    fetch(' https://new-address-crime-checker-af8564689e87.herokuapp.com/binarysearch',
       {
           method: "POST",
           headers: {
@@ -114,7 +114,7 @@ export const WelcomeView = () => {
       "longitude": longitude
     }
 
-    fetch('http://localhost:4242/coordinates',
+    fetch(' https://new-address-crime-checker-af8564689e87.herokuapp.com/coordinates',
       {
           method: "POST",
           headers: {
