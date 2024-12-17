@@ -1,20 +1,27 @@
 const puppeteer = require('puppeteer');
+const os = require('os');
+
+async function checkBrowserAvailability() {
+  console.log('Current Platform:', os.platform());
+  console.log('Current Architecture:', os.arch());
+  
+  try {
+    // Try to get the default Puppeteer executable path
+    const defaultExecutablePath = puppeteer.executablePath();
+    console.log('Puppeteer Default Executable Path:', defaultExecutablePath);
+    
+    // Check if the path exists
+    const fs = require('fs');
+    console.log('Path Exists:', fs.existsSync(defaultExecutablePath));
+  } catch (error) {
+    console.error('Error getting executable path:', error);
+  }
+}
 
 async function downloadCrimeData() {
+    checkBrowserAvailability()
     // Launch a new browser instance
     const browser = await puppeteer.launch({
-        // Heroku-specific Chrome configuration
-        executablePath: 'app/usr/bin/google-chrome-stable',
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process', // This can help with memory issues on smaller dynos
-            '--disable-gpu'
-        ],
         headless: true // Important for server environments
     });
     const page = await browser.newPage();
