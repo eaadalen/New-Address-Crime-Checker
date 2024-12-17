@@ -126,7 +126,6 @@ export const WelcomeView = () => {
     .then((response) => response.json())
     .then((data) => {
       initMap(data)
-      coordinate_data = data
     })
 
   }
