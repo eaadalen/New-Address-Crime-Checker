@@ -1,13 +1,12 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
 const Models = require('./models.js')
 const cors = require('cors')
 const port = process.env.PORT || 4242
 const crime_data = require('../client/assets/crime_data/json/sorted_crime_data.json');
 
-let allowedOrigins = ['http://localhost:1234','https://safemove.netlify.app']
+let allowedOrigins = ['http://localhost:1234','https://safemove.netlify.app/']
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -20,17 +19,32 @@ app.use(cors({
   }
 }))
 
-const userExpletives = Models.userExpletives
-//const server_url = 'https://music-stats-eka-950e8c2d4bef.herokuapp.com'
-//const client_url = 'https://music-stats.netlify.app'
-const server_url = 'http://localhost:4242'
-const client_url = 'http://localhost:1234'
-
-//mongoose.connect('', { useNewUrlParser: true, useUnifiedTopology: true })
-
 // Greeting message
 app.get('/', bodyParser.json(), (req, res) => {
   res.send("Hello")
+})
+
+// Binary search through data (on backend for improved loading speed)
+app.post('/binarysearch', bodyParser.json(), (req, res) => {
+  let low = 0;
+  let high = crime_data.length - 1;
+
+  while (true) {
+    const midIndex = Math.floor((low + high) / 2);
+    const midItem = crime_data[midIndex];
+
+    if (midItem.Latitude < req.body.latitude) {
+      low = midIndex + 1; // Search in the right half
+    } else {
+      high = midIndex - 1; // Search in the left half
+    }
+
+    if (low > high) {
+      res.send(String(midIndex))
+      return
+    }
+  }
+
 })
 
 // Get coordinates of address (on backend for improved loading speed)
@@ -83,29 +97,6 @@ app.post('/coordinates', bodyParser.json(), (req, res) => {
   }
 
   res.send(longitude_markers)
-})
-
-// Binary search through data (on backend for improved loading speed)
-app.post('/binarysearch', bodyParser.json(), (req, res) => {
-  let low = 0;
-  let high = crime_data.length - 1;
-
-  while (true) {
-    const midIndex = Math.floor((low + high) / 2);
-    const midItem = crime_data[midIndex];
-
-    if (midItem.Latitude < req.body.latitude) {
-      low = midIndex + 1; // Search in the right half
-    } else {
-      high = midIndex - 1; // Search in the left half
-    }
-
-    if (low > high) {
-      res.send(String(midIndex))
-      return
-    }
-  }
-
 })
 
 // error handling

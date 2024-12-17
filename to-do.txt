@@ -1,3 +1,2 @@
 -make responsive design. Have different layout for mobile vs desktop
--have backend update crime data every week
--make frontend pretty
+-add favicon
