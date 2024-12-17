@@ -4,7 +4,7 @@ async function downloadCrimeData() {
     // Launch a new browser instance
     const browser = await puppeteer.launch({
         // Heroku-specific Chrome configuration
-        executablePath: '/usr/bin/google-chrome-stable',
+        executablePath: 'app/usr/bin/google-chrome-stable',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
