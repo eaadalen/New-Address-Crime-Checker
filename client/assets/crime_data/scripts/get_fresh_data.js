@@ -2,7 +2,8 @@ const puppeteer = require('puppeteer');
 
 async function downloadCrimeData() {
     // Launch a new browser instance
-    const browser = await puppeteer.launch({ executablePath: 'app/node_modules/puppeteer-core/lib/cjs/puppeteer/node/BrowserLauncher.js' });
+    const browser = await puppeteer.launch({ executablePath: 'app/node_modules/puppeteer-core/lib/cjs/puppeteer/node/BrowserLauncher.js', 
+                                             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']});
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script
