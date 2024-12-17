@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "If you're moving to a new place, you probably would want to know if a crime has been committed near there recently. This app allows you to do that",
   "scripts": {
-    "start": "node server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js"
+  },
+  "puppeteer": {
+    "browserWSEndpoint": true
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",

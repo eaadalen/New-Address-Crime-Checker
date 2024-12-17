@@ -2,7 +2,21 @@ const puppeteer = require('puppeteer');
 
 async function downloadCrimeData() {
     // Launch a new browser instance
-    const browser = await puppeteer.launch({ executablePath: puppeteer.executablePath() });
+    const browser = await puppeteer.launch({
+        // Heroku-specific Chrome configuration
+        executablePath: '/usr/bin/google-chrome-stable',
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process', // This can help with memory issues on smaller dynos
+            '--disable-gpu'
+        ],
+        headless: true // Important for server environments
+    });
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script
