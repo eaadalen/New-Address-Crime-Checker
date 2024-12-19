@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^4.1.0",
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.3",
+    "chromium": "^3.0.3",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.6",
     "csvtojson": "^2.0.10",
