@@ -2,8 +2,6 @@ const puppeteer = require('puppeteer');
 const os = require('os');
 
 async function downloadCrimeData() {
-
-    console.log('test')
     // Launch a new browser instance
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
