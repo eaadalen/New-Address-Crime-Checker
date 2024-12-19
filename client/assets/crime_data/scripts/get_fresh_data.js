@@ -3,7 +3,7 @@ const os = require('os');
 
 async function downloadCrimeData() {
     // Launch a new browser instance
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: true, executablePath: '/usr/bin/chromium' });
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script
