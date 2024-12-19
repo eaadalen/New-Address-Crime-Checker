@@ -1,29 +1,11 @@
 const puppeteer = require('puppeteer');
 const os = require('os');
 
-async function checkBrowserAvailability() {
-  console.log('Current Platform:', os.platform());
-  console.log('Current Architecture:', os.arch());
-  
-  try {
-    // Try to get the default Puppeteer executable path
-    const defaultExecutablePath = puppeteer.executablePath();
-    console.log('Puppeteer Default Executable Path:', defaultExecutablePath);
-    
-    // Check if the path exists
-    const fs = require('fs');
-    console.log('Path Exists:', fs.existsSync(defaultExecutablePath));
-  } catch (error) {
-    console.error('Error getting executable path:', error);
-  }
-}
-
 async function downloadCrimeData() {
-    checkBrowserAvailability()
+
+    console.log('test')
     // Launch a new browser instance
-    const browser = await puppeteer.launch({
-        headless: true // Important for server environments
-    });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // Set the download path to the same directory as the script

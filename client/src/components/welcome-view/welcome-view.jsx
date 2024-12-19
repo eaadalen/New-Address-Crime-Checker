@@ -38,7 +38,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const WelcomeView = () => {
-  const [address, setAddress] = useState('2201 Blaisdell Ave')
+  const [address, setAddress] = useState('')
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
