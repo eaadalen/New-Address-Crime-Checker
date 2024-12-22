@@ -48,7 +48,7 @@ export const WelcomeView = () => {
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
   const infoWindowRef = useRef(null);
-  let mobile = null;
+  let mobile = false;
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -56,12 +56,12 @@ export const WelcomeView = () => {
       v: "weekly"
     })
     moment().format();
-    const device = detectDevice();
+    /*const device = detectDevice();
     if (device.isMobile) {
       mobile = true
     } else {
-      mobile = false
-    }
+      mobile = true
+    }*/
   }, [])
 
   const [isDragging, setIsDragging] = useState(false);
@@ -112,13 +112,13 @@ export const WelcomeView = () => {
   const iconRefDown = useRef(null);
 
   const handleScrollLeft = () => {
-    if (boxRef.current && mobile == false) {
+    if (boxRef.current) {
       boxRef.current.scrollLeft -= 5;
     }
   };
   
   const handleScrollRight = () => {
-    if (boxRef.current && mobile == false) {
+    if (boxRef.current) {
       boxRef.current.scrollLeft += 5;
     }
   };
@@ -329,6 +329,29 @@ export const WelcomeView = () => {
   const getVariant = (windowSeconds) => {
     return previous === windowSeconds ? 'contained' : 'outlined';
   }
+
+  const [openTooltip, setOpenTooltip] = useState(null);
+
+  const handleTooltipToggle = (event, index) => {
+    setOpenTooltip(openTooltip === index ? null : index);
+  };
+
+  const icons = [
+    { src: arson, title: "Arson" },
+    { src: assault, title: "Assault" },
+    { src: car_parts_theft, title: "Car Parts Theft" },
+    { src: car_theft, title: "Car Theft" },
+    { src: drugs, title: "Drugs" },
+    { src: general, title: "Miscellaneous" },
+    { src: hacking, title: "Hacking" },
+    { src: identity_theft, title: "Identity Theft" },
+    { src: larceny, title: "Larceny" },
+    { src: murder, title: "Murder" },
+    { src: shooting, title: "Shooting" },
+    { src: shooting_victim, title: "Shooting Victim" },
+    { src: theft, title: "Theft" },
+    { src: vandalism, title: "Vandalism" },
+  ];
 
   return (
     <Container maxWidth="sm">
@@ -585,328 +608,46 @@ export const WelcomeView = () => {
                 </Box>
               }
               {mobile && 
-                <Box 
-                  sx={{ 
-                    position: 'relative', 
+                <Box
+                  sx={{
+                    position: 'relative',
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
                     height: '60px',
                   }}
                 >
-                  <Box 
-                    ref={boxRef}
-                    sx={{ 
+                  <Box
+                    sx={{
                       overflowX: 'scroll',
                       scrollbarWidth: 'none',
-                      '&::-webkit-scrollbar': {
-                        display: 'none'
-                      },
+                      '&::-webkit-scrollbar': { display: 'none' },
                       width: '100%',
                       height: '100%',
                       display: 'flex',
-                      zIndex: 0, 
+                      zIndex: 0,
                       flexDirection: 'row',
                       alignItems: 'center',
                       cursor: 'grab',
-                      '&:active': {
-                        cursor: 'grabbing'
-                      }
+                      '&:active': { cursor: 'grabbing' },
                     }}
                   >
-                    <Tooltip 
-                      title="Arson" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={arson} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Assault" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={assault} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Car Parts Theft" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={car_parts_theft} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Car Theft" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={car_theft} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Drugs" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={drugs} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Miscellaneous" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={general} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Hacking" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={hacking} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Identity Theft" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={identity_theft} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Larceny" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={larceny} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Murder" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={murder} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Shooting" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={shooting} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Shooting Victim" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={shooting_victim} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Theft" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={theft} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
-                
-                    <Tooltip 
-                      title="Vandalism" 
-                      placement="top"
-                      enterDelay={0}
-                      leaveDelay={0}
-                      enterTouchDelay={0}
-                      leaveTouchDelay={3000}
-                    >
-                      <img 
-                        src={vandalism} 
-                        height="40" 
-                        style={{ marginRight: '10px' }}
-                        onClick={(e) => {
-                          const tooltipElement = e.currentTarget.parentElement;
-                          if (tooltipElement) {
-                            tooltipElement.setAttribute('data-showing', 'true');
-                          }
-                        }}
-                      />
-                    </Tooltip>
+                    {icons.map((icon, index) => (
+                      <Tooltip
+                        key={index}
+                        title={icon.title}
+                        placement="top"
+                        open={openTooltip === index}
+                        onClose={() => setOpenTooltip(null)}
+                      >
+                        <img
+                          src={icon.src}
+                          height="40"
+                          style={{ marginRight: '10px' }}
+                          onClick={(event) => handleTooltipToggle(event, index)}
+                        />
+                      </Tooltip>
+                    ))}
                   </Box>
                 </Box>
               }

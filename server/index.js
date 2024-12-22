@@ -110,8 +110,6 @@ cron.schedule('0 0 * * *', () => {
 });*/
 
 // listen for requests
-//app.listen(port, '0.0.0.0',() => {
-  //console.log('Listening on Port ' + port)
-//})
-
-app.listen(4242, () => console.log('Running on port 4242'))
+app.listen(port, '0.0.0.0',() => {
+  console.log('Listening on Port ' + port)
+})
