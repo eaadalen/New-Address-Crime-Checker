@@ -14,6 +14,8 @@ import shooting from '../../../assets/crime_icons/shooting.png'
 import shooting_victim from '../../../assets/crime_icons/shooting-victim.png'
 import theft from '../../../assets/crime_icons/theft.png'
 import vandalism from '../../../assets/crime_icons/vandalism.png'
+import left from '../../../assets/crime_icons/left-direction-arrow.svg'
+import right from '../../../assets/crime_icons/right-direction-arrow.svg'
 import moment from 'moment';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -130,8 +132,6 @@ export const WelcomeView = () => {
     
     // Check user agent
     const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    console.log(isMobileWidth, isTouchDevice, isMobileUserAgent)
     
     return {
       isMobile: isMobileWidth || (isTouchDevice && isMobileUserAgent),
@@ -615,6 +615,7 @@ export const WelcomeView = () => {
                     height: '60px',
                   }}
                 >
+                  <Box><img src={left} height="30" style={{ marginRight: '20px', marginTop: '7px' }} ></img></Box>
                   <Box
                     sx={{
                       overflowX: 'scroll',
@@ -647,6 +648,7 @@ export const WelcomeView = () => {
                       </Tooltip>
                     ))}
                   </Box>
+                  <Box><img src={right} height="30" style={{ marginLeft: '20px', marginTop: '7px' }} ></img></Box>
                 </Box>
               }
 
