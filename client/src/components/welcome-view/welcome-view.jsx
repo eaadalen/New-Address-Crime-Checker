@@ -107,6 +107,22 @@ export const WelcomeView = () => {
     };
   }, [isDragging, startX, scrollLeft]);
 
+  const boxRef = useRef(null);
+  const iconRefUp = useRef(null);
+  const iconRefDown = useRef(null);
+
+  const handleScrollLeft = () => {
+    if (boxRef.current && mobile == false) {
+      boxRef.current.scrollLeft -= 5;
+    }
+  };
+  
+  const handleScrollRight = () => {
+    if (boxRef.current && mobile == false) {
+      boxRef.current.scrollLeft += 5;
+    }
+  };
+
   const detectDevice = () => {
     // Check screen width
     const isMobileWidth = window.innerWidth <= 768;
@@ -313,22 +329,6 @@ export const WelcomeView = () => {
   const getVariant = (windowSeconds) => {
     return previous === windowSeconds ? 'contained' : 'outlined';
   }
-
-  const boxRef = useRef(null);
-  const iconRefUp = useRef(null);
-  const iconRefDown = useRef(null);
-
-  const handleScrollLeft = () => {
-    if (boxRef.current) {
-      boxRef.current.scrollLeft -= 5;
-    }
-  };
-  
-  const handleScrollRight = () => {
-    if (boxRef.current) {
-      boxRef.current.scrollLeft += 5;
-    }
-  };
 
   return (
     <Container maxWidth="sm">
