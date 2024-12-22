@@ -39,8 +39,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('')
-  //let server_url = 'http://localhost:4242/'
-  let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
+  let server_url = 'http://localhost:4242/'
+  //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
@@ -139,8 +139,6 @@ export const WelcomeView = () => {
     const infoWindow = new window.google.maps.InfoWindow();
     infoWindowRef.current = infoWindow;
     let index = 0
-    let glyphs = []
-    let pinElements = []
     var now = moment();
 
     map = new Map(document.getElementById("map"), {
@@ -157,77 +155,73 @@ export const WelcomeView = () => {
 
 
       if (moment().unix() - moment(date).unix() < crime_window) {
-        glyphs.push(document.createElement("img"))
-        glyphs[index].style.height = '30px';
+        const markerElement = document.createElement('img');
+        markerElement.style.width = '30px';  // Set desired size
+        markerElement.style.height = '30px';
 
         switch(element.Offense) {
           case "Arson":
-            glyphs[index].src = arson
+            markerElement.src = arson
             break;
           case "Aggravated Assault":
-            glyphs[index].src = assault
+            markerElement.src = assault
             break;
           case "Simple Assault":
-            glyphs[index].src = assault
+            markerElement.src = assault
             break;
           case "Domestic Aggravated Assault - Subset of Assault":
-            glyphs[index].src = assault
+            markerElement.src = assault
             break;
           case "Theft of Motor Vehicle Parts or Accessories":
-            glyphs[index].src = car_parts_theft
+            markerElement.src = car_parts_theft
             break;
           case "Motor Vehicle Theft":
-            glyphs[index].src = car_theft
+            markerElement.src = car_theft
             break;
           case "Drug/Narcotic Violations":
-            glyphs[index].src = drugs
+            markerElement.src = drugs
             break;
           case "Drug Equipment Violations":
-            glyphs[index].src = drugs
+            markerElement.src = drugs
             break;
           case "Hacking/Computer Invasion":
-            glyphs[index].src = hacking
+            markerElement.src = hacking
             break;
           case "Identity Theft":
-            glyphs[index].src = identity_theft
+            markerElement.src = identity_theft
             break;
           case "All Other Larceny":
-            glyphs[index].src = larceny
+            markerElement.src = larceny
             break;
           case "Murder and Nonnegligent Manslaughter":
-            glyphs[index].src = murder
+            markerElement.src = murder
             break;
           case "Shooting (PFE)":
-            glyphs[index].src = shooting
+            markerElement.src = shooting
             break;
           case "Shooting Report Only (P)":
-            glyphs[index].src = shooting
+            markerElement.src = shooting
             break;
           case "Sound of Shots Fired (P)":
-            glyphs[index].src = shooting
+            markerElement.src = shooting
             break;
           case "Gunshot Wound Victims":
-            glyphs[index].src = shooting_victim
+            markerElement.src = shooting_victim
             break;
           case "Destruction/Damage/Vandalism of Property":
-            glyphs[index].src = vandalism
+            markerElement.src = vandalism
             break;
           case "Theft From Coin-Operated Machine or Device":
-            glyphs[index].src = theft
+            markerElement.src = theft
             break;
           default:
-            glyphs[index].src = general
+            markerElement.src = general
         }
-
-        pinElements.push(new PinElement({
-          glyph: glyphs[index],
-          scale: 0
-        }))
 
         const marker = new AdvancedMarkerElement({
           map,
           position: { lat: parseFloat(element.Latitude), lng: parseFloat(element.Longitude) },
-          content: pinElements[index].element,
+          content: markerElement
         })
 
         index++
