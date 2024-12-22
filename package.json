@@ -9,16 +9,13 @@
     "browserWSEndpoint": true
   },
   "dependencies": {
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
-    "@fontsource/roboto": "^5.0.14",
+    "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
     "@parcel/reporter-dev-server": "^2.12.0",
     "@stripe/react-stripe-js": "^2.7.3",
     "@stripe/stripe-js": "^4.1.0",
     "body-parser": "^1.20.2",
-    "bootstrap": "^5.3.3",
     "chromium": "^3.0.3",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.6",
