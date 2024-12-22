@@ -39,8 +39,8 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('')
-  let server_url = 'http://localhost:4242/'
-  //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
+  //let server_url = 'http://localhost:4242/'
+  let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
@@ -48,7 +48,7 @@ export const WelcomeView = () => {
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
   const infoWindowRef = useRef(null);
-  let mobile = false;
+  const [mobile, setMobile] = useState(null)
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -56,12 +56,8 @@ export const WelcomeView = () => {
       v: "weekly"
     })
     moment().format();
-    /*const device = detectDevice();
-    if (device.isMobile) {
-      mobile = true
-    } else {
-      mobile = true
-    }*/
+    const device = detectDevice();
+    setMobile(device.isMobile)
   }, [])
 
   const [isDragging, setIsDragging] = useState(false);
@@ -134,6 +130,8 @@ export const WelcomeView = () => {
     
     // Check user agent
     const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    console.log(isMobileWidth, isTouchDevice, isMobileUserAgent)
     
     return {
       isMobile: isMobileWidth || (isTouchDevice && isMobileUserAgent),

@@ -6,11 +6,9 @@ const cors = require('cors')
 const port = process.env.PORT || 4242
 const crime_data = require('../client/assets/crime_data/json/sorted_crime_data.json');
 
-let allowedOrigins = ['http://localhost:1234','https://safemove.netlify.app/']
-
 app.use(cors({
-  origin: 'http://localhost:1234'
-  //origin: 'https://safemove.netlify.app'
+  //origin: 'http://localhost:1234'
+  origin: 'https://safemove.netlify.app'
 }))
 
 // Greeting message
