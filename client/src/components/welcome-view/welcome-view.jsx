@@ -34,13 +34,13 @@ import {
   IconButton,
   Tooltip  
 } from '@mui/material';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('')
-  //let server_url = 'http://localhost:4242/'
-  let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
+  let server_url = 'http://localhost:4242/'
+  //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
@@ -55,7 +55,31 @@ export const WelcomeView = () => {
       v: "weekly"
     })
     moment().format();
+    const device = detectDevice();
+    if (device.isMobile) {
+      const mobile = true
+    } else {
+      const mobile = false
+    }
   }, [])
+
+  const detectDevice = () => {
+    // Check screen width
+    const isMobileWidth = window.innerWidth <= 768;
+    
+    // Check touch capability
+    const isTouchDevice = ('ontouchstart' in window) || 
+                         (navigator.maxTouchPoints > 0) || 
+                         (navigator.msMaxTouchPoints > 0);
+    
+    // Check user agent
+    const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    return {
+      isMobile: isMobileWidth || (isTouchDevice && isMobileUserAgent),
+      isTouchDevice: isTouchDevice
+    };
+  };
 
   const handleSubmit = () => {
     crime_window = previous
@@ -250,15 +274,15 @@ export const WelcomeView = () => {
   const iconRefUp = useRef(null);
   const iconRefDown = useRef(null);
 
-  const handleScrollUp = () => {
+  const handleScrollLeft = () => {
     if (boxRef.current) {
-      boxRef.current.scrollTop -= 2; // Scroll up by one image height
+      boxRef.current.scrollLeft -= 5;
     }
   };
-
-  const handleScrollDown = () => {
+  
+  const handleScrollRight = () => {
     if (boxRef.current) {
-      boxRef.current.scrollTop += 2; // Scroll down by one image height
+      boxRef.current.scrollLeft += 5;
     }
   };
 
@@ -354,7 +378,7 @@ export const WelcomeView = () => {
               sx={{ 
                 display: 'flex', 
                 width: '100%',
-                alignItems: 'flex-start',
+                flexDirection: 'column', // Changed to column to stack map and scroll area
                 gap: 4
               }}
             >
@@ -362,7 +386,7 @@ export const WelcomeView = () => {
                 id="map" 
                 sx={{ 
                   width: '100%', 
-                  maxWidth: 400,
+                  maxWidth: '100%', // Adjusted to take full width
                   height: 400, 
                   backgroundColor: '#f0f0f0',
                   display: 'flex',
@@ -378,34 +402,29 @@ export const WelcomeView = () => {
               <Box 
                 sx={{ 
                   position: 'relative', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  alignItems: 'center', 
-                  maxHeight: '400px', 
-                  overflow: 'hidden' 
+                  display: 'flex',
+                  alignItems: 'center', // Center the scroll area
+                  width: '100%',
+                  height: '60px', // Adjusted for horizontal layout
                 }}
               >
                 <IconButton 
                   onMouseEnter={() => {
-                    // Start the interval when mouse enters
-                    const intervalId = setInterval(handleScrollUp, 10);
+                    const intervalId = setInterval(handleScrollLeft, 10); // Changed to handleScrollLeft
                     
-                    // Create a cleanup function for when mouse leaves
                     const handleMouseLeave = () => {
                       clearInterval(intervalId);
-                      // Remove the event listener to prevent memory leaks
                       iconRefUp.current.removeEventListener('mouseleave', handleMouseLeave);
                     };
                     
-                    // Use a ref to manage the event listener
                     iconRefUp.current.addEventListener('mouseleave', handleMouseLeave);
                   }}
                   ref={iconRefUp}
                   sx={{ 
                     position: 'absolute', 
-                    top: 0, 
+                    left: 0, // Changed from top to left
                     zIndex: 1, 
-                    width: '100%', 
+                    height: '100%', // Changed width to height
                     borderRadius: 1,
                     opacity: 1,
                     backgroundColor: 'white',
@@ -415,93 +434,88 @@ export const WelcomeView = () => {
                     }
                   }}
                 >
-                  <KeyboardArrowUpIcon />
+                  <KeyboardArrowLeftIcon /> {/* Changed from Up to Left */}
                 </IconButton>
                 
                 <Box 
                   ref={boxRef}
                   sx={{ 
-                    overflowY: 'scroll', 
-                    scrollbarWidth: 'none', // For Firefox
+                    overflowX: 'scroll', // Changed from overflowY to overflowX
+                    scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': {
-                      display: 'none' // For Chrome, Safari, and Opera
+                      display: 'none'
                     },
-                    height: '100%',
                     width: '100%',
-                    paddingTop: '40px', // Space for top arrow
-                    paddingBottom: '40px', // Space for bottom arrow
-                    maxHeight: '400px',
+                    height: '100%',
+                    paddingLeft: '40px', // Changed from paddingTop
+                    paddingRight: '40px', // Changed from paddingBottom
                     display: 'flex',
                     zIndex: 0, 
-                    flexDirection: 'column',
+                    flexDirection: 'row', // Changed from column to row
                     alignItems: 'center'
                   }}
                 >
-                  <Tooltip title="Arson" placement="right">
-                    <img src={arson} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Arson">
+                    <img src={arson} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Assault" placement="right">
-                    <img src={assault} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Assault" placement="top">
+                    <img src={assault} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Car Parts Theft" placement="right">
-                    <img src={car_parts_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Car Parts Theft" placement="top">
+                    <img src={car_parts_theft} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Car Theft" placement="right">
-                    <img src={car_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Car Theft" placement="top">
+                    <img src={car_theft} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Drugs" placement="right">
-                    <img src={drugs} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Drugs" placement="top">
+                    <img src={drugs} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Miscellaneous" placement="right">
-                    <img src={general} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Miscellaneous" placement="top">
+                    <img src={general} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Hacking" placement="right">
-                    <img src={hacking} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Hacking" placement="top">
+                    <img src={hacking} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Identity Theft" placement="right">
-                    <img src={identity_theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Identity Theft" placement="top">
+                    <img src={identity_theft} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Larceny" placement="right">
-                    <img src={larceny} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Larceny" placement="top">
+                    <img src={larceny} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Murder" placement="right">
-                    <img src={murder} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Murder" placement="top">
+                    <img src={murder} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Shooting" placement="right">
-                    <img src={shooting} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Shooting" placement="top">
+                    <img src={shooting} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Shooting Victim" placement="right">
-                    <img src={shooting_victim} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Shooting Victim" placement="top">
+                    <img src={shooting_victim} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Theft" placement="right">
-                    <img src={theft} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Theft" placement="top">
+                    <img src={theft} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
-                  <Tooltip title="Vandalism" placement="right">
-                    <img src={vandalism} height="40" style={{ marginBottom: '10px' }} /> 
+                  <Tooltip title="Vandalism" placement="top">
+                    <img src={vandalism} height="40" style={{ marginRight: '10px' }} />
                   </Tooltip>
                 </Box>
                 
                 <IconButton 
                   onMouseEnter={() => {
-                    // Start the interval when mouse enters
-                    const intervalId = setInterval(handleScrollDown, 5);
+                    const intervalId = setInterval(handleScrollRight, 5); // Changed to handleScrollRight
                     
-                    // Create a cleanup function for when mouse leaves
                     const handleMouseLeave = () => {
                       clearInterval(intervalId);
-                      // Remove the event listener to prevent memory leaks
                       iconRefDown.current.removeEventListener('mouseleave', handleMouseLeave);
                     };
                     
-                    // Use a ref to manage the event listener
                     iconRefDown.current.addEventListener('mouseleave', handleMouseLeave);
                   }}
                   ref={iconRefDown}
                   sx={{ 
                     position: 'absolute', 
-                    bottom: 0, 
+                    right: 0, // Changed from bottom to right
                     zIndex: 1, 
-                    width: '100%', 
+                    height: '100%', // Changed width to height
                     borderRadius: 1,
                     opacity: 1,
                     backgroundColor: 'white',
@@ -511,11 +525,11 @@ export const WelcomeView = () => {
                     }
                   }}
                 >
-                  <KeyboardArrowDownIcon />
+                  <KeyboardArrowRightIcon /> {/* Changed from Down to Right */}
                 </IconButton>
-
               </Box>
             </Box>
+
           </Box>
         )}
       </Box>
