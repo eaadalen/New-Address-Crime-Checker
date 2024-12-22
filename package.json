@@ -8,6 +8,10 @@
   "puppeteer": {
     "browserWSEndpoint": true
   },
+  "engines": {
+    "node": "20.10.0",
+    "npm": "10.3.0"
+  },
   "dependencies": {
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^5.16.6",
