@@ -337,10 +337,19 @@ export const WelcomeView = () => {
             </Typography>
             
             <Stack 
-              spacing={2} 
+              spacing={1} 
               direction="row" 
               justifyContent="center"
-              sx={{ mb: 3 }}
+              flexWrap="wrap"  // Enable wrapping
+              gap={1}         // Consistent gap between wrapped items
+              sx={{ 
+                mb: 3,
+                '& .MuiButton-root': {  // Target all buttons
+                  whiteSpace: 'nowrap', // Prevent text wrapping
+                  minWidth: 'auto',     // Allow buttons to shrink to content
+                  margin: '4px',        // Add margin for wrapped items
+                }
+              }}
             >
               <Button 
                 variant={getVariant(604800)} 
