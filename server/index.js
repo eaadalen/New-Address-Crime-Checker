@@ -9,8 +9,8 @@ const crime_data = require('../client/assets/crime_data/json/sorted_crime_data.j
 let allowedOrigins = ['http://localhost:1234','https://safemove.netlify.app/']
 
 app.use(cors({
-  origin: 'http://localhost:1234'
-  //origin: 'https://safemove.netlify.app'
+  //origin: 'http://localhost:1234'
+  origin: 'https://safemove.netlify.app'
 }))
 
 // Greeting message
