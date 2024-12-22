@@ -39,6 +39,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('')
+  let server_url = 'http://localhost:4242/'
+  //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
@@ -92,7 +94,7 @@ export const WelcomeView = () => {
       "latitude": latitude
     }
 
-    fetch('https://new-address-crime-checker-8125da47bbcd.herokuapp.com/binarysearch',
+    fetch(server_url + 'binarysearch',
       {
           method: "POST",
           headers: {
@@ -114,7 +116,7 @@ export const WelcomeView = () => {
       "longitude": longitude
     }
 
-    fetch('https://new-address-crime-checker-8125da47bbcd.herokuapp.com/coordinates',
+    fetch(server_url + 'coordinates',
       {
           method: "POST",
           headers: {
@@ -228,38 +230,9 @@ export const WelcomeView = () => {
           content: pinElements[index].element,
         })
 
-        // Add click event to show info window
-        marker.addListener('mouseover', () => {
-          infoWindow.setContent(`
-            <div>
-              <h3>${element.Offense}</h3>
-            </div>
-          `);
-          infoWindow.open(map, marker);
-        });
-
-        // Optional: Close info window when mouse moves away
-        marker.addListener('mouseout', () => {
-          infoWindow.close();
-        });
-
         index++
       }
-      
     })
-
-    const pin = new PinElement({
-        scale: 1.5,
-        background: "#0000FF",
-        borderColor: "#000000",
-        glyphColor: "#FFFFFF"
-    });
-    const address = new AdvancedMarkerElement({
-      map: map,
-      position: { lat: latitude, lng: longitude },
-      content: pin.element
-    })
-    
   }
 
   const handleInputChange = (event) => {
