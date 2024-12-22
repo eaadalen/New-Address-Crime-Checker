@@ -9,8 +9,8 @@ const crime_data = require('../client/assets/crime_data/json/sorted_crime_data.j
 let allowedOrigins = ['http://localhost:1234','https://safemove.netlify.app/']
 
 app.use(cors({
-  //origin: 'http://localhost:1234'
-  origin: 'https://safemove.netlify.app'
+  origin: 'http://localhost:1234'
+  //origin: 'https://safemove.netlify.app'
 }))
 
 // Greeting message
@@ -110,8 +110,8 @@ cron.schedule('0 0 * * *', () => {
 });*/
 
 // listen for requests
-app.listen(port, '0.0.0.0',() => {
-  console.log('Listening on Port ' + port)
-})
+//app.listen(port, '0.0.0.0',() => {
+  //console.log('Listening on Port ' + port)
+//})
 
-//app.listen(4242, () => console.log('Running on port 4242'))
+app.listen(4242, () => console.log('Running on port 4242'))

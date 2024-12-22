@@ -39,8 +39,8 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export const WelcomeView = () => {
   const [address, setAddress] = useState('')
-  //let server_url = 'http://localhost:4242/'
-  let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
+  let server_url = 'http://localhost:4242/'
+  //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
   let latitude = null
   let longitude = null
   let crime_window = 7257600  // as a unix timestamp, default is one month
@@ -48,6 +48,7 @@ export const WelcomeView = () => {
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
   const infoWindowRef = useRef(null);
+  let mobile = null;
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -57,11 +58,54 @@ export const WelcomeView = () => {
     moment().format();
     const device = detectDevice();
     if (device.isMobile) {
-      const mobile = true
+      mobile = true
     } else {
-      const mobile = false
+      mobile = false
     }
   }, [])
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+
+    const handleMouseDown = (e) => {
+      setIsDragging(true);
+      setStartX(e.pageX - box.offsetLeft);
+      setScrollLeft(box.scrollLeft);
+    };
+
+    const handleMouseLeave = () => {
+      setIsDragging(false);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - box.offsetLeft;
+      const walk = (x - startX) * 2;
+      box.scrollLeft = scrollLeft - walk;
+    };
+
+    box.addEventListener('mousedown', handleMouseDown);
+    box.addEventListener('mouseleave', handleMouseLeave);
+    box.addEventListener('mouseup', handleMouseUp);
+    box.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      box.removeEventListener('mousedown', handleMouseDown);
+      box.removeEventListener('mouseleave', handleMouseLeave);
+      box.removeEventListener('mouseup', handleMouseUp);
+      box.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isDragging, startX, scrollLeft]);
 
   const detectDevice = () => {
     // Check screen width
@@ -408,137 +452,466 @@ export const WelcomeView = () => {
                 </Typography>
               </Box>
               
-              <Box 
-                sx={{ 
-                  position: 'relative', 
-                  display: 'flex',
-                  alignItems: 'center', // Center the scroll area
-                  width: '100%',
-                  height: '60px', // Adjusted for horizontal layout
-                }}
-              >
-                <IconButton 
-                  onMouseEnter={() => {
-                    const intervalId = setInterval(handleScrollLeft, 10); // Changed to handleScrollLeft
-                    
-                    const handleMouseLeave = () => {
-                      clearInterval(intervalId);
-                      iconRefUp.current.removeEventListener('mouseleave', handleMouseLeave);
-                    };
-                    
-                    iconRefUp.current.addEventListener('mouseleave', handleMouseLeave);
-                  }}
-                  ref={iconRefUp}
-                  sx={{ 
-                    position: 'absolute', 
-                    left: 0, // Changed from top to left
-                    zIndex: 1, 
-                    height: '100%', // Changed width to height
-                    borderRadius: 1,
-                    opacity: 1,
-                    backgroundColor: 'white',
-                    '&:hover': {
-                      opacity: 1,
-                      backgroundColor: 'white'
-                    }
-                  }}
-                >
-                  <KeyboardArrowLeftIcon /> {/* Changed from Up to Left */}
-                </IconButton>
-                
+              {!mobile && 
                 <Box 
-                  ref={boxRef}
                   sx={{ 
-                    overflowX: 'scroll', // Changed from overflowY to overflowX
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': {
-                      display: 'none'
-                    },
-                    width: '100%',
-                    height: '100%',
-                    paddingLeft: '40px', // Changed from paddingTop
-                    paddingRight: '40px', // Changed from paddingBottom
+                    position: 'relative', 
                     display: 'flex',
-                    zIndex: 0, 
-                    flexDirection: 'row', // Changed from column to row
-                    alignItems: 'center'
+                    alignItems: 'center', // Center the scroll area
+                    width: '100%',
+                    height: '60px', // Adjusted for horizontal layout
                   }}
                 >
-                  <Tooltip title="Arson">
-                    <img src={arson} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Assault" placement="top">
-                    <img src={assault} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Car Parts Theft" placement="top">
-                    <img src={car_parts_theft} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Car Theft" placement="top">
-                    <img src={car_theft} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Drugs" placement="top">
-                    <img src={drugs} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Miscellaneous" placement="top">
-                    <img src={general} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Hacking" placement="top">
-                    <img src={hacking} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Identity Theft" placement="top">
-                    <img src={identity_theft} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Larceny" placement="top">
-                    <img src={larceny} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Murder" placement="top">
-                    <img src={murder} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Shooting" placement="top">
-                    <img src={shooting} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Shooting Victim" placement="top">
-                    <img src={shooting_victim} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Theft" placement="top">
-                    <img src={theft} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                  <Tooltip title="Vandalism" placement="top">
-                    <img src={vandalism} height="40" style={{ marginRight: '10px' }} />
-                  </Tooltip>
-                </Box>
-                
-                <IconButton 
-                  onMouseEnter={() => {
-                    const intervalId = setInterval(handleScrollRight, 5); // Changed to handleScrollRight
-                    
-                    const handleMouseLeave = () => {
-                      clearInterval(intervalId);
-                      iconRefDown.current.removeEventListener('mouseleave', handleMouseLeave);
-                    };
-                    
-                    iconRefDown.current.addEventListener('mouseleave', handleMouseLeave);
-                  }}
-                  ref={iconRefDown}
-                  sx={{ 
-                    position: 'absolute', 
-                    right: 0, // Changed from bottom to right
-                    zIndex: 1, 
-                    height: '100%', // Changed width to height
-                    borderRadius: 1,
-                    opacity: 1,
-                    backgroundColor: 'white',
-                    '&:hover': {
+                  <IconButton 
+                    onMouseEnter={() => {
+                      const intervalId = setInterval(handleScrollLeft, 10); // Changed to handleScrollLeft
+                      
+                      const handleMouseLeave = () => {
+                        clearInterval(intervalId);
+                        iconRefUp.current.removeEventListener('mouseleave', handleMouseLeave);
+                      };
+                      
+                      iconRefUp.current.addEventListener('mouseleave', handleMouseLeave);
+                    }}
+                    ref={iconRefUp}
+                    sx={{ 
+                      position: 'absolute', 
+                      left: 0, // Changed from top to left
+                      zIndex: 1, 
+                      height: '100%', // Changed width to height
+                      borderRadius: 1,
                       opacity: 1,
-                      backgroundColor: 'white'
-                    }
+                      backgroundColor: 'white',
+                      '&:hover': {
+                        opacity: 1,
+                        backgroundColor: 'white'
+                      }
+                    }}
+                  >
+                    <KeyboardArrowLeftIcon /> {/* Changed from Up to Left */}
+                  </IconButton>
+                  
+                  <Box 
+                    ref={boxRef}
+                    sx={{ 
+                      overflowX: 'scroll', // Changed from overflowY to overflowX
+                      scrollbarWidth: 'none',
+                      '&::-webkit-scrollbar': {
+                        display: 'none'
+                      },
+                      width: '100%',
+                      height: '100%',
+                      paddingLeft: '40px', // Changed from paddingTop
+                      paddingRight: '40px', // Changed from paddingBottom
+                      display: 'flex',
+                      zIndex: 0, 
+                      flexDirection: 'row', // Changed from column to row
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Tooltip title="Arson">
+                      <img src={arson} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Assault" placement="top">
+                      <img src={assault} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Car Parts Theft" placement="top">
+                      <img src={car_parts_theft} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Car Theft" placement="top">
+                      <img src={car_theft} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Drugs" placement="top">
+                      <img src={drugs} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Miscellaneous" placement="top">
+                      <img src={general} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Hacking" placement="top">
+                      <img src={hacking} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Identity Theft" placement="top">
+                      <img src={identity_theft} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Larceny" placement="top">
+                      <img src={larceny} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Murder" placement="top">
+                      <img src={murder} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Shooting" placement="top">
+                      <img src={shooting} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Shooting Victim" placement="top">
+                      <img src={shooting_victim} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Theft" placement="top">
+                      <img src={theft} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                    <Tooltip title="Vandalism" placement="top">
+                      <img src={vandalism} height="40" style={{ marginRight: '10px' }} />
+                    </Tooltip>
+                  </Box>
+                  
+                  <IconButton 
+                    onMouseEnter={() => {
+                      const intervalId = setInterval(handleScrollRight, 5); // Changed to handleScrollRight
+                      
+                      const handleMouseLeave = () => {
+                        clearInterval(intervalId);
+                        iconRefDown.current.removeEventListener('mouseleave', handleMouseLeave);
+                      };
+                      
+                      iconRefDown.current.addEventListener('mouseleave', handleMouseLeave);
+                    }}
+                    ref={iconRefDown}
+                    sx={{ 
+                      position: 'absolute', 
+                      right: 0, // Changed from bottom to right
+                      zIndex: 1, 
+                      height: '100%', // Changed width to height
+                      borderRadius: 1,
+                      opacity: 1,
+                      backgroundColor: 'white',
+                      '&:hover': {
+                        opacity: 1,
+                        backgroundColor: 'white'
+                      }
+                    }}
+                  >
+                    <KeyboardArrowRightIcon /> {/* Changed from Down to Right */}
+                  </IconButton>
+
+                </Box>
+              }
+              {mobile && 
+                <Box 
+                  sx={{ 
+                    position: 'relative', 
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '60px',
                   }}
                 >
-                  <KeyboardArrowRightIcon /> {/* Changed from Down to Right */}
-                </IconButton>
-              </Box>
-            </Box>
+                  <Box 
+                    ref={boxRef}
+                    sx={{ 
+                      overflowX: 'scroll',
+                      scrollbarWidth: 'none',
+                      '&::-webkit-scrollbar': {
+                        display: 'none'
+                      },
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      zIndex: 0, 
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      cursor: 'grab',
+                      '&:active': {
+                        cursor: 'grabbing'
+                      }
+                    }}
+                  >
+                    <Tooltip 
+                      title="Arson" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={arson} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Assault" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={assault} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Car Parts Theft" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={car_parts_theft} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Car Theft" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={car_theft} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Drugs" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={drugs} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Miscellaneous" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={general} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Hacking" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={hacking} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Identity Theft" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={identity_theft} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Larceny" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={larceny} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Murder" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={murder} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Shooting" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={shooting} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Shooting Victim" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={shooting_victim} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Theft" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={theft} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                
+                    <Tooltip 
+                      title="Vandalism" 
+                      placement="top"
+                      enterDelay={0}
+                      leaveDelay={0}
+                      enterTouchDelay={0}
+                      leaveTouchDelay={3000}
+                    >
+                      <img 
+                        src={vandalism} 
+                        height="40" 
+                        style={{ marginRight: '10px' }}
+                        onClick={(e) => {
+                          const tooltipElement = e.currentTarget.parentElement;
+                          if (tooltipElement) {
+                            tooltipElement.setAttribute('data-showing', 'true');
+                          }
+                        }}
+                      />
+                    </Tooltip>
+                  </Box>
+                </Box>
+              }
 
+            </Box>
           </Box>
         )}
       </Box>
