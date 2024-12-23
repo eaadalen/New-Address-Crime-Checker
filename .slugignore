@@ -1,2 +1,9 @@
 *.parcel-cache
-/client
+/client/src
+/client/assets/crime_icons
+/client/assets/favicon
+/client/assets/crime_data/csv
+/client/assets/crime_data/scripts
+/client/assets/crime_data/refresh_crime_data.js
+/client/assets/crime_data/json/Crime_Data.json
+/client/assets/crime_data/json/unique_crimes.json
