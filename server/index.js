@@ -97,7 +97,7 @@ app.use((err, req, res, next) => {
     res.send('Something broke!')
 })
 
-/*const refresh_crime_data = require('../client/assets/crime_data/refresh_crime_data.js')
+const refresh_crime_data = require('../client/assets/crime_data/refresh_crime_data.js')
 
 const cron = require('node-cron');
 
@@ -105,7 +105,7 @@ const cron = require('node-cron');
 cron.schedule('0 0 * * *', () => {
   console.log('Updating crime data');
   refresh_crime_data()
-});*/
+});
 
 // listen for requests
 app.listen(port, '0.0.0.0',() => {

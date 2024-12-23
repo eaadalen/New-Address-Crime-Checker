@@ -1,4 +1,3 @@
--make responsive design. Have different layout for mobile vs desktop
 -add favicon
 -move data to true backend
 -add error handling for blank or invalid address
