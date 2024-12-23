@@ -34582,8 +34582,8 @@ var _s = $RefreshSig$();
 const WelcomeView = ()=>{
     _s();
     const [address, setAddress] = (0, _react.useState)("");
-    //let server_url = 'http://localhost:4242/'
-    let server_url = "https://new-address-crime-checker-8125da47bbcd.herokuapp.com/";
+    let server_url = "http://localhost:4242/";
+    //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
     let latitude = null;
     let longitude = null;
     let crime_window = 7257600 // as a unix timestamp, default is one month
