@@ -5,14 +5,8 @@
   "scripts": {
     "start": "node server/index.js"
   },
-  "puppeteer": {
-    "browserWSEndpoint": true
-  },
-  "engines": {
-    "node": "20.10.0",
-    "npm": "10.3.0"
-  },
   "dependencies": {
+    "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
@@ -55,7 +49,7 @@
     "@parcel/transformer-webmanifest": "^2.11.0",
     "buffer": "^6.0.3",
     "domain-browser": "^3.5.0",
-    "parcel": "^2.11.0",
+    "parcel": "^2.12.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "sort-package-json": "^2.10.0",
