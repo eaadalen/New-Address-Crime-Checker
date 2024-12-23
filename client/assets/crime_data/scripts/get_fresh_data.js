@@ -9,6 +9,7 @@ async function downloadCrimeData() {
             '--disable-setuid-sandbox'
         ],
         executablePath: process.env.GOOGLE_CHROME_BIN || null,
+        channel: 'chrome', 
         headless: true
     });
     const page = await browser.newPage();
