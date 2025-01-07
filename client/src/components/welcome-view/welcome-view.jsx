@@ -40,17 +40,16 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 export const WelcomeView = () => {
-  const [address, setAddress] = useState('')
-  //let server_url = 'http://localhost:4242/'
-  let server_url = 'https://new-address-crime-checker-1906d674b09c.herokuapp.com/'
-  let latitude = null
-  let longitude = null
+  const [address, setAddress] = useState('2201 Blaisdell Ave')
   let crime_window = 7257600  // as a unix timestamp, default is one month
   let map;
+  let sorted_data = null
   const [previous, setPrevious] = useState(7257600)
   const [submitted, setSubmitted] = useState(false)
   const infoWindowRef = useRef(null);
   const [mobile, setMobile] = useState(null)
+  const [crimeData, setCrimeData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
@@ -60,11 +59,12 @@ export const WelcomeView = () => {
     moment().format();
     const device = detectDevice();
     setMobile(device.isMobile)
+    fetchCrimeData()
   }, [])
 
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0)
 
   useEffect(() => {
     const box = boxRef.current;
@@ -103,7 +103,7 @@ export const WelcomeView = () => {
       box.removeEventListener('mouseup', handleMouseUp);
       box.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [isDragging, startX, scrollLeft]);
+  }, [isDragging, startX, scrollLeft])
 
   const boxRef = useRef(null);
   const iconRefUp = useRef(null);
@@ -113,13 +113,13 @@ export const WelcomeView = () => {
     if (boxRef.current) {
       boxRef.current.scrollLeft -= 5;
     }
-  };
+  }
   
   const handleScrollRight = () => {
     if (boxRef.current) {
       boxRef.current.scrollLeft += 5;
     }
-  };
+  }
 
   const detectDevice = () => {
     // Check screen width
@@ -137,7 +137,48 @@ export const WelcomeView = () => {
       isMobile: isMobileWidth || (isTouchDevice && isMobileUserAgent),
       isTouchDevice: isTouchDevice
     };
-  };
+  }
+
+  async function fetchCrimeData() {
+
+    fetch('https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Crime_Data/FeatureServer/0/query?where=1%3D1&outFields=occurred_date,offense,latitude,longitude&f=json',
+      {
+          method: "GET"
+      }
+    )
+    .then((response) => response.json())
+    .then((data) => {
+      sort_data(data.features)
+      setLoading(false)
+    })
+
+  }
+
+  async function sort_data(unsorted_data) {
+    sorted_data = await quicksort(unsorted_data, 'Latitude')
+    console.log(sorted_data)
+  }
+
+  function quicksort(arr, key) {
+
+    if (arr.length <= 1) {
+      return arr
+    }
+  
+    const pivot = arr[arr.length - 1];
+    const left = []
+    const right = []
+  
+    for (let i = 0; i < arr.length - 1; i++) {
+      if (arr[i].attributes[key] < pivot.attributes[key]) {
+        left.push(arr[i])
+      } else {
+        right.push(arr[i])
+      }
+    }
+
+    return [...quicksort(left, key), pivot, ...quicksort(right, key)]
+  }
 
   const handleSubmit = () => {
     crime_window = previous
@@ -163,59 +204,90 @@ export const WelcomeView = () => {
     )
     .then((response) => response.json())
     .then((data) => {
-      latitude = data.result.geocode.location.latitude
-      longitude = data.result.geocode.location.longitude
-      binarySearchByLatitude()
+      binarySearchByLatitude(data.result.geocode.location.latitude, data.result.geocode.location.longitude)
       setSubmitted(true)
     })
   }
 
-  function binarySearchByLatitude() {
+  function binarySearchByLatitude(latitude, longitude) {
+    console.log(sorted_data)
+    let low = 0;
+    let high = sorted_data.length - 1;
 
-    const data = {
-      "latitude": latitude
-    }
+    while (true) {
+      const midIndex = Math.floor((low + high) / 2);
+      const midItem = sorted_data[midIndex];
+      console.log(latitude, sorted_data[midIndex].attributes.Latitude)
 
-    fetch(server_url + 'binarysearch',
-      {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
+      if (midItem.attributes.Latitude < latitude) {
+        low = midIndex + 1; // Search in the right half
+      } else {
+        high = midIndex - 1; // Search in the left half
       }
-    )
-    .then((response) => response.json())
-    .then((data) => {
-      getMarkerCoordinates(data)
-    })
+
+      if (low > high) {
+        getMarkerCoordinates(midIndex, latitude, longitude)
+        return
+      }
+    }
   }
 
-  const getMarkerCoordinates = (midIndex) => {
-
-    const data = {
-      "midIndex": midIndex,
-      "longitude": longitude
-    }
-
-    fetch(server_url + 'coordinates',
-      {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
+  const getMarkerCoordinates = (midIndex, latitude, longitude) => {
+    console.log(midIndex, latitude, longitude)
+    let countUp = midIndex
+    let countDown = midIndex
+    let latitude_markers = []
+    while (true) {
+      try {
+        if (sorted_data[countUp].Latitude - sorted_data[midIndex].Latitude < 0.0057968) { // 0.0057968 change in latitude is equal to 0.4 miles
+          latitude_markers.push(sorted_data[countUp])
+          countUp++
+        }
+        else {
+          break
+        }
       }
-    )
-    .then((response) => response.json())
-    .then((data) => {
-      initMap(data)
-    })
-
+      catch {
+        // skip to next
+      }
+    }
+    while (true) {
+      try {
+        if (sorted_data[midIndex].Latitude - sorted_data[countDown].Latitude < 0.0057968) { // 0.0057968 change in latitude is equal to 0.4 miles
+          latitude_markers.push(sorted_data[countDown])
+          countDown--
+        }
+        else {
+          break
+        }
+      }
+      catch {
+        // skip to next
+      }
+    }
+  
+    let index = 0
+    let longitude_markers = []
+    while (index < latitude_markers.length) {
+      index++
+      try {
+        if (Math.abs(latitude_markers[index].Longitude - longitude) < 0.007312) { // 0.007312 change in longitude is equal to 0.4 miles
+          longitude_markers.push(latitude_markers[index])
+          index++
+        }
+      }
+      catch {
+        // skip
+      }
+    }
+    
+    console.log(latitude_markers, longitude_markers)
+    initMap(longitude_markers, latitude, longitude)
   }
 
-  async function initMap(markerArray) {
+  async function initMap(markerArray, latitude, longitude) {
 
+    console.log(markerArray)
     const { Map } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     const infoWindow = new window.google.maps.InfoWindow();
@@ -395,7 +467,19 @@ export const WelcomeView = () => {
           </Button>
         </Box>
 
-        {submitted && (
+        {!loading && (
+          <Typography variant="h5" gutterBottom>
+            
+          </Typography>
+        )}
+
+        {submitted && loading && (
+          <div className="flex justify-center items-center h-full w-full p-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+
+        {submitted && !loading && (
           <Box sx={{ width: '100%', maxWidth: 600 }}>
             <Typography variant="subtitle1" gutterBottom>
               Show all crimes within last:

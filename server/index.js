@@ -1,14 +1,13 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const Models = require('./models.js')
 const cors = require('cors')
 const port = process.env.PORT || 4242
 const crime_data = require('../client/assets/crime_data/json/sorted_crime_data.json');
 
 app.use(cors({
-  //origin: 'http://localhost:1234'
-  origin: 'https://safemove.netlify.app'
+  origin: 'http://localhost:1234'
+  //origin: 'https://safemove.netlify.app'
 }))
 
 // Greeting message
@@ -96,16 +95,6 @@ app.use((err, req, res, next) => {
     console.error(err.stack)
     res.send('Something broke!')
 })
-
-const refresh_crime_data = require('../client/assets/crime_data/refresh_crime_data.js')
-
-const cron = require('node-cron');
-
-// Update crime data every day at midnight (00:00)
-cron.schedule('0 0 * * *', () => {
-  console.log('Updating crime data');
-  refresh_crime_data()
-});
 
 // listen for requests
 app.listen(port, '0.0.0.0',() => {

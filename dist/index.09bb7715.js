@@ -34581,18 +34581,17 @@ var _keyboardArrowRightDefault = parcelHelpers.interopDefault(_keyboardArrowRigh
 var _s = $RefreshSig$();
 const WelcomeView = ()=>{
     _s();
-    const [address, setAddress] = (0, _react.useState)("");
-    let server_url = "http://localhost:4242/";
-    //let server_url = 'https://new-address-crime-checker-8125da47bbcd.herokuapp.com/'
-    let latitude = null;
-    let longitude = null;
+    const [address, setAddress] = (0, _react.useState)("2201 Blaisdell Ave");
     let crime_window = 7257600 // as a unix timestamp, default is one month
     ;
     let map;
+    let sorted_data = null;
     const [previous, setPrevious] = (0, _react.useState)(7257600);
     const [submitted, setSubmitted] = (0, _react.useState)(false);
     const infoWindowRef = (0, _react.useRef)(null);
     const [mobile, setMobile] = (0, _react.useState)(null);
+    const [crimeData, setCrimeData] = (0, _react.useState)(null);
+    const [loading, setLoading] = (0, _react.useState)(true);
     (0, _react.useEffect)(()=>{
         ((g)=>{
             var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
@@ -34618,6 +34617,7 @@ const WelcomeView = ()=>{
         (0, _momentDefault.default)().format();
         const device = detectDevice();
         setMobile(device.isMobile);
+        fetchCrimeData();
     }, []);
     const [isDragging, setIsDragging] = (0, _react.useState)(false);
     const [startX, setStartX] = (0, _react.useState)(0);
@@ -34679,6 +34679,31 @@ const WelcomeView = ()=>{
             isTouchDevice: isTouchDevice
         };
     };
+    async function fetchCrimeData() {
+        fetch("https://services.arcgis.com/afSMGVsC7QlRK1kZ/arcgis/rest/services/Crime_Data/FeatureServer/0/query?where=1%3D1&outFields=occurred_date,offense,latitude,longitude&f=json", {
+            method: "GET"
+        }).then((response)=>response.json()).then((data)=>{
+            sort_data(data.features);
+            setLoading(false);
+        });
+    }
+    async function sort_data(unsorted_data) {
+        sorted_data = await quicksort(unsorted_data, "Latitude");
+        console.log(sorted_data);
+    }
+    function quicksort(arr, key) {
+        if (arr.length <= 1) return arr;
+        const pivot = arr[arr.length - 1];
+        const left = [];
+        const right = [];
+        for(let i = 0; i < arr.length - 1; i++)if (arr[i].attributes[key] < pivot.attributes[key]) left.push(arr[i]);
+        else right.push(arr[i]);
+        return [
+            ...quicksort(left, key),
+            pivot,
+            ...quicksort(right, key)
+        ];
+    }
     const handleSubmit = ()=>{
         crime_window = previous;
         findAddress();
@@ -34700,42 +34725,65 @@ const WelcomeView = ()=>{
             },
             body: JSON.stringify(data)
         }).then((response)=>response.json()).then((data)=>{
-            latitude = data.result.geocode.location.latitude;
-            longitude = data.result.geocode.location.longitude;
-            binarySearchByLatitude();
+            binarySearchByLatitude(data.result.geocode.location.latitude, data.result.geocode.location.longitude);
             setSubmitted(true);
         });
     };
-    function binarySearchByLatitude() {
-        const data = {
-            "latitude": latitude
-        };
-        fetch(server_url + "binarysearch", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }).then((response)=>response.json()).then((data)=>{
-            getMarkerCoordinates(data);
-        });
+    function binarySearchByLatitude(latitude, longitude) {
+        console.log(sorted_data);
+        let low = 0;
+        let high = sorted_data.length - 1;
+        while(true){
+            const midIndex = Math.floor((low + high) / 2);
+            const midItem = sorted_data[midIndex];
+            console.log(latitude, sorted_data[midIndex].attributes.Latitude);
+            if (midItem.attributes.Latitude < latitude) low = midIndex + 1; // Search in the right half
+            else high = midIndex - 1; // Search in the left half
+            if (low > high) {
+                getMarkerCoordinates(midIndex, latitude, longitude);
+                return;
+            }
+        }
     }
-    const getMarkerCoordinates = (midIndex)=>{
-        const data = {
-            "midIndex": midIndex,
-            "longitude": longitude
-        };
-        fetch(server_url + "coordinates", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }).then((response)=>response.json()).then((data)=>{
-            initMap(data);
-        });
+    const getMarkerCoordinates = (midIndex, latitude, longitude)=>{
+        console.log(midIndex, latitude, longitude);
+        let countUp = midIndex;
+        let countDown = midIndex;
+        let latitude_markers = [];
+        while(true)try {
+            if (sorted_data[countUp].Latitude - sorted_data[midIndex].Latitude < 0.0057968) {
+                latitude_markers.push(sorted_data[countUp]);
+                countUp++;
+            } else break;
+        } catch  {
+        // skip to next
+        }
+        while(true)try {
+            if (sorted_data[midIndex].Latitude - sorted_data[countDown].Latitude < 0.0057968) {
+                latitude_markers.push(sorted_data[countDown]);
+                countDown--;
+            } else break;
+        } catch  {
+        // skip to next
+        }
+        let index = 0;
+        let longitude_markers = [];
+        while(index < latitude_markers.length){
+            index++;
+            try {
+                if (Math.abs(latitude_markers[index].Longitude - longitude) < 0.007312) {
+                    longitude_markers.push(latitude_markers[index]);
+                    index++;
+                }
+            } catch  {
+            // skip
+            }
+        }
+        console.log(latitude_markers, longitude_markers);
+        initMap(longitude_markers, latitude, longitude);
     };
-    async function initMap(markerArray) {
+    async function initMap(markerArray, latitude, longitude) {
+        console.log(markerArray);
         const { Map } = await google.maps.importLibrary("maps");
         const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
         const infoWindow = new window.google.maps.InfoWindow();
@@ -34907,7 +34955,7 @@ const WelcomeView = ()=>{
         children: [
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.CssBaseline), {}, void 0, false, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 356,
+                lineNumber: 428,
                 columnNumber: 7
             }, undefined),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -34927,7 +34975,7 @@ const WelcomeView = ()=>{
                         children: "Enter New Address"
                     }, void 0, false, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 368,
+                        lineNumber: 440,
                         columnNumber: 9
                     }, undefined),
                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -34951,7 +34999,7 @@ const WelcomeView = ()=>{
                                 }
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 381,
+                                lineNumber: 453,
                                 columnNumber: 11
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Button), {
@@ -34963,16 +35011,38 @@ const WelcomeView = ()=>{
                                 children: "Submit"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 389,
+                                lineNumber: 461,
                                 columnNumber: 11
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 372,
+                        lineNumber: 444,
                         columnNumber: 9
                     }, undefined),
-                    submitted && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
+                    !loading && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Typography), {
+                        variant: "h5",
+                        gutterBottom: true
+                    }, void 0, false, {
+                        fileName: "client/src/components/welcome-view/welcome-view.jsx",
+                        lineNumber: 471,
+                        columnNumber: 11
+                    }, undefined),
+                    submitted && loading && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                        className: "flex justify-center items-center h-full w-full p-4",
+                        children: /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+                            className: "animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
+                        }, void 0, false, {
+                            fileName: "client/src/components/welcome-view/welcome-view.jsx",
+                            lineNumber: 478,
+                            columnNumber: 13
+                        }, undefined)
+                    }, void 0, false, {
+                        fileName: "client/src/components/welcome-view/welcome-view.jsx",
+                        lineNumber: 477,
+                        columnNumber: 11
+                    }, undefined),
+                    submitted && !loading && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
                         sx: {
                             width: "100%",
                             maxWidth: 600
@@ -34984,7 +35054,7 @@ const WelcomeView = ()=>{
                                 children: "Show all crimes within last:"
                             }, void 0, false, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 400,
+                                lineNumber: 484,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Stack), {
@@ -35009,7 +35079,7 @@ const WelcomeView = ()=>{
                                         children: "Week"
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 419,
+                                        lineNumber: 503,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Button), {
@@ -35018,7 +35088,7 @@ const WelcomeView = ()=>{
                                         children: "Month"
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 425,
+                                        lineNumber: 509,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Button), {
@@ -35027,7 +35097,7 @@ const WelcomeView = ()=>{
                                         children: "3 months"
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 431,
+                                        lineNumber: 515,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Button), {
@@ -35036,7 +35106,7 @@ const WelcomeView = ()=>{
                                         children: "6 months"
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 437,
+                                        lineNumber: 521,
                                         columnNumber: 15
                                     }, undefined),
                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Button), {
@@ -35045,13 +35115,13 @@ const WelcomeView = ()=>{
                                         children: "Year"
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 443,
+                                        lineNumber: 527,
                                         columnNumber: 15
                                     }, undefined)
                                 ]
                             }, void 0, true, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 404,
+                                lineNumber: 488,
                                 columnNumber: 13
                             }, undefined),
                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35079,12 +35149,12 @@ const WelcomeView = ()=>{
                                             children: "Map Placeholder"
                                         }, void 0, false, {
                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                            lineNumber: 471,
+                                            lineNumber: 555,
                                             columnNumber: 17
                                         }, undefined)
                                     }, void 0, false, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 459,
+                                        lineNumber: 543,
                                         columnNumber: 15
                                     }, undefined),
                                     !mobile && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35122,14 +35192,14 @@ const WelcomeView = ()=>{
                                                 children: [
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _keyboardArrowLeftDefault.default), {}, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 512,
+                                                        lineNumber: 596,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     " "
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 486,
+                                                lineNumber: 570,
                                                 columnNumber: 19
                                             }, undefined),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35160,12 +35230,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 534,
+                                                            lineNumber: 618,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 533,
+                                                        lineNumber: 617,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35179,12 +35249,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 537,
+                                                            lineNumber: 621,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 536,
+                                                        lineNumber: 620,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35198,12 +35268,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 540,
+                                                            lineNumber: 624,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 539,
+                                                        lineNumber: 623,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35217,12 +35287,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 543,
+                                                            lineNumber: 627,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 542,
+                                                        lineNumber: 626,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35236,12 +35306,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 546,
+                                                            lineNumber: 630,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 545,
+                                                        lineNumber: 629,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35255,12 +35325,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 549,
+                                                            lineNumber: 633,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 548,
+                                                        lineNumber: 632,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35274,12 +35344,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 552,
+                                                            lineNumber: 636,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 551,
+                                                        lineNumber: 635,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35293,12 +35363,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 555,
+                                                            lineNumber: 639,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 554,
+                                                        lineNumber: 638,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35312,12 +35382,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 558,
+                                                            lineNumber: 642,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 557,
+                                                        lineNumber: 641,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35331,12 +35401,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 561,
+                                                            lineNumber: 645,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 560,
+                                                        lineNumber: 644,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35350,12 +35420,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 564,
+                                                            lineNumber: 648,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 563,
+                                                        lineNumber: 647,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35369,12 +35439,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 567,
+                                                            lineNumber: 651,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 566,
+                                                        lineNumber: 650,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35388,12 +35458,12 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 570,
+                                                            lineNumber: 654,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 569,
+                                                        lineNumber: 653,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Tooltip), {
@@ -35407,18 +35477,18 @@ const WelcomeView = ()=>{
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 573,
+                                                            lineNumber: 657,
                                                             columnNumber: 23
                                                         }, undefined)
                                                     }, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 572,
+                                                        lineNumber: 656,
                                                         columnNumber: 21
                                                     }, undefined)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 515,
+                                                lineNumber: 599,
                                                 columnNumber: 19
                                             }, undefined),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.IconButton), {
@@ -35447,20 +35517,20 @@ const WelcomeView = ()=>{
                                                 children: [
                                                     /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _keyboardArrowRightDefault.default), {}, void 0, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 603,
+                                                        lineNumber: 687,
                                                         columnNumber: 21
                                                     }, undefined),
                                                     " "
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 577,
+                                                lineNumber: 661,
                                                 columnNumber: 19
                                             }, undefined)
                                         ]
                                     }, void 0, true, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 477,
+                                        lineNumber: 561,
                                         columnNumber: 17
                                     }, undefined),
                                     mobile && /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35482,12 +35552,12 @@ const WelcomeView = ()=>{
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                    lineNumber: 618,
+                                                    lineNumber: 702,
                                                     columnNumber: 24
                                                 }, undefined)
                                             }, void 0, false, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 618,
+                                                lineNumber: 702,
                                                 columnNumber: 19
                                             }, undefined),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35522,17 +35592,17 @@ const WelcomeView = ()=>{
                                                             onClick: (event)=>handleTooltipToggle(event, index)
                                                         }, void 0, false, {
                                                             fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                            lineNumber: 642,
+                                                            lineNumber: 726,
                                                             columnNumber: 25
                                                         }, undefined)
                                                     }, index, false, {
                                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                        lineNumber: 635,
+                                                        lineNumber: 719,
                                                         columnNumber: 23
                                                     }, undefined))
                                             }, void 0, false, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 619,
+                                                lineNumber: 703,
                                                 columnNumber: 19
                                             }, undefined),
                                             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _material.Box), {
@@ -35545,46 +35615,46 @@ const WelcomeView = ()=>{
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                    lineNumber: 651,
+                                                    lineNumber: 735,
                                                     columnNumber: 24
                                                 }, undefined)
                                             }, void 0, false, {
                                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                                lineNumber: 651,
+                                                lineNumber: 735,
                                                 columnNumber: 19
                                             }, undefined)
                                         ]
                                     }, void 0, true, {
                                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                        lineNumber: 609,
+                                        lineNumber: 693,
                                         columnNumber: 17
                                     }, undefined)
                                 ]
                             }, void 0, true, {
                                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                                lineNumber: 451,
+                                lineNumber: 535,
                                 columnNumber: 13
                             }, undefined)
                         ]
                     }, void 0, true, {
                         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                        lineNumber: 399,
+                        lineNumber: 483,
                         columnNumber: 11
                     }, undefined)
                 ]
             }, void 0, true, {
                 fileName: "client/src/components/welcome-view/welcome-view.jsx",
-                lineNumber: 357,
+                lineNumber: 429,
                 columnNumber: 7
             }, undefined)
         ]
     }, void 0, true, {
         fileName: "client/src/components/welcome-view/welcome-view.jsx",
-        lineNumber: 355,
+        lineNumber: 427,
         columnNumber: 5
     }, undefined);
 };
-_s(WelcomeView, "nQQbG9xzDIFa1aEb2ADJT7Kx/+c=");
+_s(WelcomeView, "YHb1fX0KaoVk4hfvpu2eY5/PenI=");
 _c = WelcomeView;
 var _c;
 $RefreshReg$(_c, "WelcomeView");
